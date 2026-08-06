@@ -388,16 +388,3 @@
   :is(.autofit__overflow-badge, .autofit__unsupported-badge) {
   display: none;
 }
-
-.slidev-layout.cover,
-.slidev-layout.intro {
-  @apply h-full grid;
-
-  h1 {
-    @apply text-6xl leading-20 mb-4;
-  }
-
-  h1 + p {
-    @apply text-2xl -mt-2 opacity-65 mb-4;
-  }
-}
