@@ -1,7 +1,4 @@
 :root {
-  --slidev-theme-primary: #7a0019;
-  --slide-background: #ffffff;
-  --slide-foreground: #000000;
   --slidev-autofit-base-spacing: 1rem;
   --slidev-autofit-diagnostic-color: #7a0019;
   --slidev-auto-image-region-gap: 1rem;
@@ -10,21 +7,6 @@
   --slidev-auto-image-caption-font-size: 0.875rem;
   --slidev-auto-image-caption-line-height: 1.25rem;
   --slidev-auto-image-caption-color: color-mix(in srgb, var(--slide-foreground) 70%, transparent);
-}
-
-html.dark {
-  --slidev-theme-primary: #ffcc33;
-  --slide-background: #000000;
-  --slide-foreground: #f3f4f6;
-}
-
-.slidev-layout {
-  background-color: var(--slide-background);
-  color: var(--slide-foreground);
-}
-
-.slidev-layout :is(h1, h2, h3, h4, h5, h6, strong, b) {
-  color: var(--slidev-theme-primary);
 }
 
 .slidev-layout.default.default-layout,
