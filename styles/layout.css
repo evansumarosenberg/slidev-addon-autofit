@@ -1,0 +1,421 @@
+:root {
+  --slidev-theme-primary: #7a0019;
+  --slide-background: #ffffff;
+  --slide-foreground: #000000;
+  --slidev-autofit-base-spacing: 1rem;
+  --slidev-autofit-diagnostic-color: #7a0019;
+  --slidev-auto-image-region-gap: 1rem;
+  --slidev-auto-image-caption-gap: 1rem;
+  --slidev-auto-image-item-gap: 1rem;
+  --slidev-auto-image-caption-font-size: 0.875rem;
+  --slidev-auto-image-caption-line-height: 1.25rem;
+  --slidev-auto-image-caption-color: color-mix(in srgb, var(--slide-foreground) 70%, transparent);
+}
+
+html.dark {
+  --slidev-theme-primary: #ffcc33;
+  --slide-background: #000000;
+  --slide-foreground: #f3f4f6;
+}
+
+.slidev-layout {
+  background-color: var(--slide-background);
+  color: var(--slide-foreground);
+}
+
+.slidev-layout :is(h1, h2, h3, h4, h5, h6, strong, b) {
+  color: var(--slidev-theme-primary);
+}
+
+.slidev-layout.default.default-layout,
+.slidev-layout.auto-column.auto-column-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0;
+  overflow: hidden;
+  padding-block-end: 1.5rem;
+}
+
+
+/*
+ * Keep the base theme's optical fixed-heading offsets without moving their
+ * layout rectangles outside the padded box.
+ */
+.slidev-layout.default
+  > :where(.default-layout__main, .default-layout__footer)
+  :is(h1, h6),
+.slidev-layout.auto-column
+  > :where(.auto-column-layout__main, .auto-column-layout__footer)
+  :is(h1, h6),
+.slidev-layout.auto-image
+  > :where(.auto-image-layout__main, .auto-image-layout__footer)
+  :is(h1, h6) {
+  margin-inline-start: 0;
+  text-indent: -0.05em;
+}
+
+/*
+ * AutoFit measures against a clipped inner viewport, so its h1/h6 headings
+ * must not inherit either form of the fixed-region optical offset.
+ */
+.slidev-layout .autofit__flow :is(h1, h6) {
+  margin-inline-start: 0;
+  text-indent: 0;
+}
+
+.default-layout__main {
+  grid-row: 1;
+  min-width: 0;
+}
+
+.default-layout > .autofit {
+  grid-row: 2;
+}
+
+.default-layout__footer {
+  grid-row: 3;
+  min-width: 0;
+}
+
+.default-layout__footer > :last-child {
+  margin-block-end: 0rem;
+}
+
+.auto-column-layout__main {
+  grid-row: 1;
+  min-width: 0;
+}
+
+.auto-column-layout > .autofit-coordination-pair {
+  display: grid;
+  grid-row: 2;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  min-width: 0;
+  min-height: 0;
+}
+
+.auto-column-layout > .autofit-coordination-pair > .autofit {
+  min-width: 0;
+  min-height: 0;
+}
+
+.auto-column-layout__footer {
+  grid-row: 3;
+  min-width: 0;
+}
+
+.auto-column-layout__footer > :last-child {
+  margin-block-end: 0rem;
+}
+
+.slidev-layout.auto-image.auto-image-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0;
+  overflow: hidden;
+  padding-block-end: 1.5rem;
+}
+
+.auto-image-layout__main {
+  grid-row: 1;
+  min-width: 0;
+}
+
+.auto-image-layout__stage {
+  position: relative;
+  display: grid;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.auto-image-layout__image-track,
+.auto-image-layout__auto-track {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.auto-image-layout__image-track > .auto-image,
+.auto-image-layout__auto-track.autofit {
+  width: 100%;
+  height: 100%;
+}
+
+.auto-image-layout__semantic-probe {
+  display: none !important;
+}
+
+.auto-image-layout__footer {
+  grid-row: 3;
+  min-width: 0;
+}
+
+.auto-image-layout__footer > :last-child {
+  margin-block-end: 0rem;
+}
+
+.auto-image-layout__diagnostics {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.35rem;
+  pointer-events: none;
+}
+
+.auto-image-layout__diagnostics :is(
+  .auto-image-layout__config-error-badge,
+  .auto-image-layout__overflow-badge,
+  .auto-image-layout__unsupported-badge,
+  .auto-image-layout__image-overflow-badge,
+  .auto-image-layout__image-unsupported-badge,
+  .auto-image-layout__fixed-overflow-badge
+) {
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.2rem;
+  background: var(--slidev-autofit-diagnostic-color);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.auto-image-layout__fixed-diagnostics {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0.35rem;
+  pointer-events: none;
+}
+
+.auto-image-layout__fixed-overflow-badge {
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.2rem;
+  background: var(--slidev-autofit-diagnostic-color);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.auto-image-layout--config-error,
+.auto-image-layout--split-overflow,
+.auto-image-layout--unsupported,
+.auto-image-layout .auto-image--overflow,
+.auto-image-layout .auto-image--unsupported {
+  box-shadow: inset 0 0 0 2px var(--slidev-autofit-diagnostic-color);
+}
+
+.auto-image-layout--overflow
+  :is(.auto-image-layout__stage, .auto-image-layout__image-track,
+    .auto-image-layout__auto-track, .auto-image, .autofit) {
+  box-shadow: none;
+}
+
+.auto-image-layout--overflow
+  :is(
+    .auto-image-layout__config-error-badge,
+    .auto-image-layout__overflow-badge,
+    .auto-image-layout__unsupported-badge,
+    .auto-image-layout__image-overflow-badge,
+    .auto-image-layout__image-unsupported-badge,
+    .autofit__overflow-badge,
+    .autofit__unsupported-badge
+  ) {
+  display: none;
+}
+
+.auto-image-layout--overflow {
+  box-shadow: inset 0 0 0 2px var(--slidev-autofit-diagnostic-color);
+}
+
+.autofit {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.autofit__viewport {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.autofit__flow {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.auto-image {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.auto-image__viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.auto-image__flow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.auto-image--pending .auto-image__flow {
+  visibility: hidden;
+}
+
+.auto-image__managed-image-wrapper {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.auto-image__managed-image {
+  position: absolute !important;
+  inset-inline-start: var(--slidev-auto-image-image-inline-offset) !important;
+  inset-block-start: var(--slidev-auto-image-image-block-offset) !important;
+  display: block !important;
+  width: var(--slidev-auto-image-image-inline-size) !important;
+  height: var(--slidev-auto-image-image-block-size) !important;
+  max-width: none !important;
+  max-height: none !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  object-fit: fill !important;
+}
+
+.auto-image__managed-caption {
+  position: absolute !important;
+  inset-inline-start: var(--slidev-auto-image-caption-inline-offset, 0px) !important;
+  inset-block-start: var(--slidev-auto-image-caption-block-offset) !important;
+  display: block !important;
+  width: var(--slidev-auto-image-caption-inline-size, 100%) !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 0 !important;
+  font-size: var(--slidev-auto-image-caption-font-size) !important;
+  line-height: var(--slidev-auto-image-caption-line-height) !important;
+  color: var(--slidev-auto-image-caption-color) !important;
+  text-align: center !important;
+  overflow: hidden !important;
+}
+
+.auto-image__omitted-item {
+  display: none !important;
+}
+
+.auto-image--overflow,
+.auto-image--unsupported {
+  box-shadow: inset 0 0 0 2px var(--slidev-autofit-diagnostic-color);
+}
+
+.autofit--pending .autofit__viewport {
+  visibility: hidden;
+}
+
+.autofit--pending-visible .autofit__viewport {
+  visibility: visible;
+}
+
+.autofit__diagnostics,
+.default-layout__diagnostics,
+.auto-column-layout__diagnostics {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.default-layout--overflow,
+.auto-column-layout--overflow {
+  box-shadow: inset 0 0 0 2px var(--slidev-autofit-diagnostic-color);
+}
+
+.autofit--overflow,
+.autofit--unsupported {
+  box-shadow: inset 0 0 0 2px var(--slidev-autofit-diagnostic-color);
+}
+
+.autofit__overflow-badge,
+.autofit__unsupported-badge,
+.default-layout__overflow-badge,
+.auto-column-layout__overflow-badge {
+  position: absolute;
+  inset-block-start: 0.35rem;
+  inset-inline-end: 0.35rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.2rem;
+  background: var(--slidev-autofit-diagnostic-color);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.default-layout--overflow :is(.autofit--overflow, .autofit--unsupported) {
+  box-shadow: none;
+}
+
+.auto-column-layout--overflow :is(.autofit--overflow, .autofit--unsupported) {
+  box-shadow: none;
+}
+
+.default-layout--overflow
+  :is(.autofit__overflow-badge, .autofit__unsupported-badge) {
+  display: none;
+}
+
+.auto-column-layout--overflow
+  :is(.autofit__overflow-badge, .autofit__unsupported-badge) {
+  display: none;
+}
+
+.slidev-layout.cover,
+.slidev-layout.intro {
+  @apply h-full grid;
+
+  h1 {
+    @apply text-6xl leading-20 mb-4;
+  }
+
+  h1 + p {
+    @apply text-2xl -mt-2 opacity-65 mb-4;
+  }
+}

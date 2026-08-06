@@ -1,0 +1,32 @@
+{
+  "name": "slidev-addon-autofit",
+  "version": "0.0.0",
+  "type": "module",
+  "keywords": [
+    "slidev-addon",
+    "slidev"
+  ],
+  "engines": {
+    "node": ">=20.12.0"
+  },
+  "scripts": {
+    "build": "slidev build example.md",
+    "dev": "slidev example.md --open",
+    "export": "slidev export example.md",
+    "screenshot": "slidev export example.md --format png",
+    "test:unit": "vitest run",
+    "test:browser": "playwright test --pass-with-no-tests",
+    "test": "pnpm test:unit && pnpm test:browser",
+    "validate": "pnpm test && pnpm build"
+  },
+  "dependencies": {
+    "@slidev/types": "^52.19.0"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^52.19.0",
+    "@playwright/test": "^1.61.1",
+    "@slidev/theme-default": "latest",
+    "happy-dom": "^20.10.6",
+    "vitest": "^4.1.10"
+  }
+}
