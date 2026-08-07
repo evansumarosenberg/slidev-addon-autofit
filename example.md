@@ -952,7 +952,7 @@ autofit:
 
 # Overflow demonstration: vertical AutoFit (intentional)
 
-This slide intentionally exceeds the auto track vertically at its only configured tier. Expect clipping, forced top alignment, a UMN-red outline, and an **AUTOFIT OVERFLOW** badge.
+This slide intentionally exceeds the auto track vertically at its only configured tier. Expect clipping, forced top alignment, a diagnostic-color outline, and an **AUTOFIT OVERFLOW** badge.
 
 ::auto::
 
@@ -991,7 +991,7 @@ This slide intentionally disables wrapping for one managed text unit. Expect cli
 
 # Overflow demonstration: fixed-region layout (intentional)
 
-This slide intentionally puts too much ordinary Markdown in the fixed default slot. There is no auto slot: expect slide-boundary clipping, a UMN-red outline, and the distinct **LAYOUT OVERFLOW** badge.
+This slide intentionally puts too much ordinary Markdown in the fixed default slot. There is no auto slot: expect slide-boundary clipping, a diagnostic-color outline, and the distinct **LAYOUT OVERFLOW** badge.
 
 1. Intentional fixed-region line 01
 2. Intentional fixed-region line 02

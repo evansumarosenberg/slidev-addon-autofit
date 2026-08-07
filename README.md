@@ -1,15 +1,15 @@
 # slidev-addon-autofit
 
-[![NPM version](https://img.shields.io/npm/v/slidev-addon-autolayout?color=7A0019&label=)](https://www.npmjs.com/package/slidev-addon-autolayout)
+[![NPM version](https://img.shields.io/npm/v/slidev-addon-autofit?color=7A0019&label=)](https://www.npmjs.com/package/slidev-addon-autofit)
 
 A [Slidev](https://github.com/slidevjs/slidev) addon with a WYSIWYM default layout: authors describe ordinary Markdown structure, and the optional AutoFit region selects the largest configured typography-and-spacing tier that fits its real browser geometry.
 
 ## Installation
 
-This project requires Node.js 20.12 or newer. Add the theme to a Slidev project with pnpm:
+This project requires Node.js 20.12 or newer. Add the addon to a Slidev project with pnpm:
 
 ```bash
-pnpm add -D slidev-addon-autolayout
+pnpm add -D slidev-addon-autofit
 ```
 
 Select it in the deck's headmatter:
@@ -17,20 +17,20 @@ Select it in the deck's headmatter:
 ```yaml
 ---
 addons:
-  - autolayout
+  - autofit
 ---
 ```
 
-Slidev can also prompt to install the package when it first encounters that theme name.
+Slidev can also prompt to install the package when it first encounters that addon name.
 
-To develop the theme repository itself:
+To develop this addon repository:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-`pnpm dev` serves and opens the comprehensive [`example.md`](./example.md) deck. That local deck uses `theme: ./` so edits to the repository are reflected directly.
+`pnpm dev` serves and opens the comprehensive [`example.md`](./example.md) deck. The local deck retains `theme: default` and discovers this repository's addon files directly, so edits are reflected immediately.
 
 ## Default layout and named slots
 
