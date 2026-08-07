@@ -2059,7 +2059,7 @@ image:
 
 ::image::
 
-![Auto image left](../../public/images/placeholder.jpg)
+![Auto image left](../../public/images/autofit_placeholder.jpg)
 
 <div data-testid="auto-image-left-main">Fixed main</div>
 
@@ -2076,7 +2076,7 @@ autofit:
 
 ::image::
 
-![Auto image center](../../public/images/placeholder.jpg)
+![Auto image center](../../public/images/autofit_placeholder.jpg)
 
 ---
 layout: auto-image
@@ -2089,7 +2089,7 @@ image:
 
 ::image::
 
-![Auto image right](../../public/images/placeholder.jpg)
+![Auto image right](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2106,7 +2106,7 @@ image:
 
 ::image::
 
-![Auto image top](../../public/images/placeholder.jpg)
+![Auto image top](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2127,7 +2127,7 @@ image:
 
 ::image::
 
-![Auto image bottom](../../public/images/placeholder.jpg)
+![Auto image bottom](../../public/images/autofit_placeholder.jpg)
 
 ---
 layout: auto-image
@@ -2140,7 +2140,7 @@ image:
 
 ::image::
 
-![Auto image omitted auto](../../public/images/placeholder.jpg)
+![Auto image omitted auto](../../public/images/autofit_placeholder.jpg)
 
 ---
 layout: auto-image
@@ -2153,7 +2153,7 @@ image:
 
 ::image::
 
-![Auto image center content](../../public/images/placeholder.jpg)
+![Auto image center content](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2170,7 +2170,7 @@ image:
 
 ::image::
 
-![Auto image empty auto](../../public/images/placeholder.jpg)
+![Auto image empty auto](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2189,7 +2189,7 @@ image:
 
 ::image::
 
-![Invalid configuration image](../../public/images/placeholder.jpg)
+![Invalid configuration image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2215,7 +2215,7 @@ autofit:
 
 ::image::
 
-![Auto image raw config](../../public/images/placeholder.jpg)
+![Auto image raw config](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2232,7 +2232,7 @@ image:
 
 ::image::
 
-![Auto image split overflow](../../public/images/placeholder.jpg)
+![Auto image split overflow](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2266,7 +2266,7 @@ image:
 
 ::image::
 
-![Auto image center empty](../../public/images/placeholder.jpg)
+![Auto image center empty](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2282,7 +2282,7 @@ image:
 
 ::image::
 
-![Auto image shell](../../public/images/placeholder.jpg)
+![Auto image shell](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2324,7 +2324,7 @@ image:
 
 ::image::
 
-![Center whitespace image](../../public/images/placeholder.jpg)
+![Center whitespace image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2341,7 +2341,7 @@ image:
 
 ::image::
 
-![Center comment image](../../public/images/placeholder.jpg)
+![Center comment image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2358,7 +2358,7 @@ image:
 
 ::image::
 
-![Center sentinel image](../../public/images/placeholder.jpg)
+![Center sentinel image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2375,7 +2375,7 @@ image:
 
 ::image::
 
-![Center component-empty image](../../public/images/placeholder.jpg)
+![Center component-empty image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2392,7 +2392,7 @@ image:
 
 ::image::
 
-![Center reveal-hidden image](../../public/images/placeholder.jpg)
+![Center reveal-hidden image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2411,7 +2411,7 @@ autofit:
 
 ::image::
 
-![Center visible image](../../public/images/placeholder.jpg)
+![Center visible image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2428,7 +2428,7 @@ image:
 
 ::image::
 
-![Bridge left omitted image](../../public/images/placeholder.jpg)
+![Bridge left omitted image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2446,7 +2446,7 @@ autofit: {}
 
 ::image::
 
-![Bridge right default image](../../public/images/placeholder.jpg)
+![Bridge right default image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2465,7 +2465,7 @@ autofit:
 
 ::image::
 
-![Bridge top partial image](../../public/images/placeholder.jpg)
+![Bridge top partial image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2487,7 +2487,7 @@ autofit:
 
 ::image::
 
-![Bridge bottom custom image](../../public/images/placeholder.jpg)
+![Bridge bottom custom image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2509,7 +2509,7 @@ autofit:
 
 ::image::
 
-![Bridge left invalid image](../../public/images/placeholder.jpg)
+![Bridge left invalid image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2526,7 +2526,7 @@ image:
 
 ::image::
 
-![Bridge right omitted image](../../public/images/placeholder.jpg)
+![Bridge right omitted image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2544,7 +2544,7 @@ autofit: {}
 
 ::image::
 
-![Bridge top default image](../../public/images/placeholder.jpg)
+![Bridge top default image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2563,7 +2563,7 @@ autofit:
 
 ::image::
 
-![Bridge bottom partial image](../../public/images/placeholder.jpg)
+![Bridge bottom partial image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2585,7 +2585,7 @@ autofit:
 
 ::image::
 
-![Bridge left custom image](../../public/images/placeholder.jpg)
+![Bridge left custom image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2607,7 +2607,7 @@ autofit:
 
 ::image::
 
-![Bridge right invalid image](../../public/images/placeholder.jpg)
+![Bridge right invalid image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2624,7 +2624,7 @@ image:
 
 ::image::
 
-![Bridge top omitted image](../../public/images/placeholder.jpg)
+![Bridge top omitted image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2642,7 +2642,7 @@ autofit: {}
 
 ::image::
 
-![Bridge bottom default image](../../public/images/placeholder.jpg)
+![Bridge bottom default image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2661,7 +2661,7 @@ autofit:
 
 ::image::
 
-![Bridge left partial image](../../public/images/placeholder.jpg)
+![Bridge left partial image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2683,7 +2683,7 @@ autofit:
 
 ::image::
 
-![Bridge right custom image](../../public/images/placeholder.jpg)
+![Bridge right custom image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2705,7 +2705,7 @@ autofit:
 
 ::image::
 
-![Bridge top invalid image](../../public/images/placeholder.jpg)
+![Bridge top invalid image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2722,7 +2722,7 @@ image:
 
 ::image::
 
-![Bridge bottom omitted image](../../public/images/placeholder.jpg)
+![Bridge bottom omitted image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2740,7 +2740,7 @@ autofit: {}
 
 ::image::
 
-![Bridge left default image](../../public/images/placeholder.jpg)
+![Bridge left default image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2759,7 +2759,7 @@ autofit:
 
 ::image::
 
-![Bridge right partial image](../../public/images/placeholder.jpg)
+![Bridge right partial image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2781,7 +2781,7 @@ autofit:
 
 ::image::
 
-![Bridge top custom image](../../public/images/placeholder.jpg)
+![Bridge top custom image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2803,7 +2803,7 @@ autofit:
 
 ::image::
 
-![Bridge bottom invalid image](../../public/images/placeholder.jpg)
+![Bridge bottom invalid image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2820,7 +2820,7 @@ image:
 
 ::image::
 
-![Center live image](../../public/images/placeholder.jpg)
+![Center live image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2883,7 +2883,7 @@ image:
 
 ::image::
 
-![Auto image shell equivalent](../../public/images/placeholder.jpg)
+![Auto image shell equivalent](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2942,7 +2942,7 @@ image:
 
 ::image::
 
-![Subpixel threshold image](../../public/images/placeholder.jpg)
+![Subpixel threshold image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2959,7 +2959,7 @@ image:
 
 ::image::
 
-![Fixed config precedence image](../../public/images/placeholder.jpg)
+![Fixed config precedence image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -2980,7 +2980,7 @@ image:
 
 ::image::
 
-![Fixed split precedence image](../../public/images/placeholder.jpg)
+![Fixed split precedence image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -3001,7 +3001,7 @@ image:
 
 ::image::
 
-![Fixed center precedence image](../../public/images/placeholder.jpg)
+![Fixed center precedence image](../../public/images/autofit_placeholder.jpg)
 
 ::auto::
 

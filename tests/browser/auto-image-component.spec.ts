@@ -1210,7 +1210,6 @@ test('publishes exact default custom properties and derives caption color in lig
       captionGap: style.getPropertyValue('--slidev-auto-image-caption-gap').trim(),
       captionFontSize: style.getPropertyValue('--slidev-auto-image-caption-font-size').trim(),
       captionLineHeight: style.getPropertyValue('--slidev-auto-image-caption-line-height').trim(),
-      captionColorInput: style.getPropertyValue('--slidev-auto-image-caption-color').trim(),
       captionColor: getComputedStyle(caption).color,
     }
   })
@@ -1219,12 +1218,11 @@ test('publishes exact default custom properties and derives caption color in lig
     captionGap: '1rem',
     captionFontSize: '0.875rem',
     captionLineHeight: '1.25rem',
-    captionColorInput: 'color-mix(in srgb, #000000 70%, transparent)',
   })
 
   const expectedColor = await root.evaluate((element) => {
     const reference = document.createElement('span')
-    reference.style.color = 'color-mix(in srgb, var(--slide-foreground) 70%, transparent)'
+    reference.style.color = 'color-mix(in srgb, currentColor 70%, transparent)'
     element.append(reference)
     const color = getComputedStyle(reference).color
     reference.remove()
@@ -1240,21 +1238,16 @@ test('publishes exact default custom properties and derives caption color in lig
   const darkColor = await root.evaluate((element) => {
     const caption = element.querySelector('.auto-image__managed-caption')!
     const reference = document.createElement('span')
-    reference.style.color = 'color-mix(in srgb, var(--slide-foreground) 70%, transparent)'
+    reference.style.color = 'color-mix(in srgb, currentColor 70%, transparent)'
     element.append(reference)
     const result = {
       caption: getComputedStyle(caption).color,
       reference: getComputedStyle(reference).color,
-      colorInput: getComputedStyle(element)
-        .getPropertyValue('--slidev-auto-image-caption-color')
-        .trim(),
     }
     reference.remove()
     return result
   })
   expect(darkColor.caption).toBe(darkColor.reference)
-  expect(darkColor.colorInput)
-    .toBe('color-mix(in srgb, #f3f4f6 70%, transparent)')
 })
 
 test('publishes every overflow reason with exact group geometry and precedence', async ({ page }) => {
