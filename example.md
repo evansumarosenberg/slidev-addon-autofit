@@ -2,8 +2,6 @@
 theme: default
 colorSchema: light
 comark: true
-addons:
-  - ./
 ---
 
 # Slidev Autofit Addon
