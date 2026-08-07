@@ -1,5 +1,6 @@
 import type { Ref } from 'vue'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { AUTOFIT_DIAGNOSTIC_PREFIX } from './diagnostic-prefix'
 
 const LAYOUT_OVERFLOW_TOLERANCE = 0.5
 
@@ -172,7 +173,7 @@ export function useLayoutOverflow(elements: LayoutOverflowElements) {
 
     if (nextOverflowing && !overflowing.value) {
       console.warn(
-        '[slidev-theme-umn-autolayout] LAYOUT OVERFLOW: fixed main/footer content exceeds the padded slide content box.',
+        `${AUTOFIT_DIAGNOSTIC_PREFIX} LAYOUT OVERFLOW: fixed main/footer content exceeds the padded slide content box.`,
       )
     }
 

@@ -543,7 +543,7 @@ test('center has no AutoFit or gap and probes only a declared auto slot', async 
   )
   await expect.poll(() => centerWarnings.length).toBe(1)
   expect(centerWarnings[0]).toBe(
-    '[slidev-theme-umn-autolayout] AUTO IMAGE UNSUPPORTED (center-with-auto-content): center mode cannot place substantive AutoFit content.',
+    '[slidev-addon-autofit] AUTO IMAGE UNSUPPORTED (center-with-auto-content): center mode cannot place substantive AutoFit content.',
   )
   await expect(substantive.locator('.autofit')).toHaveCount(0)
 
@@ -596,7 +596,7 @@ test('invalid image configuration is atomic and leaves only fixed content visibl
   await expect(layout.locator('.auto-image-layout__semantic-probe')).toHaveCount(0)
   await expect(layout.getByTestId('auto-image-invalid-footer')).toBeVisible()
   await expect.poll(() => warnings.length).toBe(1)
-  expect(warnings[0]).toContain('[slidev-theme-umn-autolayout]')
+  expect(warnings[0]).toContain('[slidev-addon-autofit]')
   expect(warnings[0]).toContain('unknown-property')
   expect(warnings[0]).toContain('invalid-position-value')
   expect(warnings[0]).toContain('invalid-size-syntax')
@@ -683,7 +683,7 @@ test('recomputes split overflow when only the layout region gap changes', async 
     reenteredTracks[0].y + reenteredTracks[0].height + 16 * stageScale,
   )
   expect(warnings[warnings.length - 1]).toBe(
-    '[slidev-theme-umn-autolayout] AUTO IMAGE LAYOUT OVERFLOW (region-gap): image allocation plus the required region gap exceeds the remaining stage.',
+    '[slidev-addon-autofit] AUTO IMAGE LAYOUT OVERFLOW (region-gap): image allocation plus the required region gap exceeds the remaining stage.',
   )
 
   await stage.evaluate((element) => {
@@ -1328,7 +1328,7 @@ test('forwards raw AutoFit configuration across every non-center position', asyn
       await expect(autofit).toHaveAttribute('data-autofit-config-error', 'invalid-small-tiers')
       await expect.poll(() => warnings.length).toBe(1)
       expect(warnings[0]).toMatch(
-        /^\[slidev-theme-umn-autolayout\] AUTOFIT CONFIGURATION ERROR \(/,
+        /^\[slidev-addon-autofit\] AUTOFIT CONFIGURATION ERROR \(/,
       )
       expect(warnings[0]).toContain('AUTOFIT CONFIGURATION ERROR')
       expect(warnings[0]).toContain('invalid-small-tiers')

@@ -22,6 +22,7 @@ import {
   createAutoImageLifecycle,
 } from '../utils/auto-image/lifecycle'
 import { areFiniteAutoImageValues } from '../utils/auto-image/finite'
+import { AUTOFIT_DIAGNOSTIC_PREFIX } from '../utils/autofit/diagnostic-prefix'
 import type {
   AutoImageCaptionMeasurement,
   AutoImageFitGeometry,
@@ -127,7 +128,7 @@ function publish(nextState: AutoImageState, nextReason: AutoImageReason | null):
     if (warningKey !== nextKey) {
       warningKey = nextKey
       console.warn(
-        `[slidev-theme-umn-autolayout] AUTO IMAGE OVERFLOW (${nextReason}): managed image content exceeds its viewport.`,
+        `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTO IMAGE OVERFLOW (${nextReason}): managed image content exceeds its viewport.`,
       )
     }
   }
@@ -136,7 +137,7 @@ function publish(nextState: AutoImageState, nextReason: AutoImageReason | null):
     if (warningKey !== nextKey) {
       warningKey = nextKey
       console.warn(
-        `[slidev-theme-umn-autolayout] AUTO IMAGE UNSUPPORTED (${nextReason}): authored image content is shown without managed sizing.`,
+        `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTO IMAGE UNSUPPORTED (${nextReason}): authored image content is shown without managed sizing.`,
       )
     }
   }

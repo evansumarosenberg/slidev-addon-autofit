@@ -22,6 +22,7 @@ import {
   sharedAutofitDomScheduler,
 } from '../utils/autofit/dom-scheduler'
 import { isAutofitViewportRenderable } from '../utils/autofit/geometry'
+import { AUTOFIT_DIAGNOSTIC_PREFIX } from '../utils/autofit/diagnostic-prefix'
 import { autoColumnContextKey } from '../utils/autofit/auto-column-context'
 import type {
   AutoColumnCurrentSourceCoordinate,
@@ -249,7 +250,7 @@ function warnForInvalidConfiguration(): void {
 
   warnedConfigurations.add(signature)
   console.warn(
-    `[slidev-theme-umn-autolayout] AUTOFIT CONFIGURATION ERROR (${signature}); using complete defaults.`,
+    `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTOFIT CONFIGURATION ERROR (${signature}); using complete defaults.`,
   )
 }
 
@@ -368,7 +369,7 @@ function commitUnsupportedState(
 
   if (unsupportedWarningReason !== reason) {
     console.warn(
-      `[slidev-theme-umn-autolayout] AUTOFIT UNSUPPORTED (${reason}): content is shown with authored neutral typography in top flow.`,
+      `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTOFIT UNSUPPORTED (${reason}): content is shown with authored neutral typography in top flow.`,
     )
   }
   unsupportedWarningReason = reason
@@ -434,7 +435,7 @@ function commitStaticResult(
 
     if (enteringOverflow) {
       console.warn(
-        '[slidev-theme-umn-autolayout] AUTOFIT OVERFLOW: content exceeds the AutoFit viewport at the smallest configured tier.',
+        `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTOFIT OVERFLOW: content exceeds the AutoFit viewport at the smallest configured tier.`,
       )
     }
   })
@@ -812,7 +813,7 @@ function publishAutoColumnPrepared(): void {
 
   if (enteringOverflow) {
     console.warn(
-      '[slidev-theme-umn-autolayout] AUTOFIT OVERFLOW: content exceeds the AutoFit viewport at the smallest configured tier.',
+      `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTOFIT OVERFLOW: content exceeds the AutoFit viewport at the smallest configured tier.`,
     )
   }
 }
@@ -924,7 +925,7 @@ function publishAutoColumnSynchronizedTarget(): void {
         ? 'required coordinated start alignment exceeds the AutoFit viewport'
         : 'required coordinated semantic gaps exceed the AutoFit viewport'
     console.warn(
-      `[slidev-theme-umn-autolayout] AUTOFIT OVERFLOW: ${requirement} at the shared tier; no smaller-tier fallback was attempted.`,
+      `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTOFIT OVERFLOW: ${requirement} at the shared tier; no smaller-tier fallback was attempted.`,
     )
   }
 }

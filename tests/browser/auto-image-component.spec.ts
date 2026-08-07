@@ -1597,7 +1597,7 @@ test('deduplicates stable warnings and follows reason-change, recovery, and re-e
   const warnings: string[] = []
   page.on('console', message => {
     if (message.type() === 'warning'
-      && message.text().startsWith('[slidev-theme-umn-autolayout] AUTO IMAGE')) {
+      && message.text().startsWith('[slidev-addon-autofit] AUTO IMAGE')) {
       warnings.push(message.text())
     }
   })
@@ -1621,7 +1621,7 @@ test('deduplicates stable warnings and follows reason-change, recovery, and re-e
   )
   await expect.poll(() => warnings.length).toBeGreaterThan(beforeFirstTransition)
   expect(warnings[warnings.length - 1]).toBe(
-    '[slidev-theme-umn-autolayout] AUTO IMAGE OVERFLOW (caption-inline-overflow): managed image content exceeds its viewport.',
+    '[slidev-addon-autofit] AUTO IMAGE OVERFLOW (caption-inline-overflow): managed image content exceeds its viewport.',
   )
   const afterFirstTransition = warnings.length
 
@@ -1640,7 +1640,7 @@ test('deduplicates stable warnings and follows reason-change, recovery, and re-e
   )
   await expect.poll(() => warnings.length).toBe(afterFirstTransition + 1)
   expect(warnings[warnings.length - 1]).toBe(
-    '[slidev-theme-umn-autolayout] AUTO IMAGE OVERFLOW (zero-block-space): managed image content exceeds its viewport.',
+    '[slidev-addon-autofit] AUTO IMAGE OVERFLOW (zero-block-space): managed image content exceeds its viewport.',
   )
 
   await page.getByTestId('auto-image-transition-restore-block').click()
@@ -1660,7 +1660,7 @@ test('deduplicates stable warnings and follows reason-change, recovery, and re-e
   )
   await expect.poll(() => warnings.length).toBe(beforeUnsupported + 1)
   expect(warnings[warnings.length - 1]).toBe(
-    '[slidev-theme-umn-autolayout] AUTO IMAGE UNSUPPORTED (missing-image): authored image content is shown without managed sizing.',
+    '[slidev-addon-autofit] AUTO IMAGE UNSUPPORTED (missing-image): authored image content is shown without managed sizing.',
   )
   const afterMissing = warnings.length
 
@@ -1674,7 +1674,7 @@ test('deduplicates stable warnings and follows reason-change, recovery, and re-e
   )
   await expect.poll(() => warnings.length).toBe(afterMissing + 1)
   expect(warnings[warnings.length - 1]).toBe(
-    '[slidev-theme-umn-autolayout] AUTO IMAGE UNSUPPORTED (unexpected-image-wrapper): authored image content is shown without managed sizing.',
+    '[slidev-addon-autofit] AUTO IMAGE UNSUPPORTED (unexpected-image-wrapper): authored image content is shown without managed sizing.',
   )
 
   await root.locator('.auto-image__flow').evaluate(flow => {
@@ -1692,7 +1692,7 @@ test('deduplicates stable warnings and follows reason-change, recovery, and re-e
   )
   await expect.poll(() => warnings.length).toBe(beforeReentry + 1)
   expect(warnings[warnings.length - 1]).toBe(
-    '[slidev-theme-umn-autolayout] AUTO IMAGE UNSUPPORTED (missing-image): authored image content is shown without managed sizing.',
+    '[slidev-addon-autofit] AUTO IMAGE UNSUPPORTED (missing-image): authored image content is shown without managed sizing.',
   )
 })
 

@@ -35,6 +35,7 @@ import type {
   AutoImageLayoutLifecycle,
 } from '../utils/auto-image/layout-lifecycle'
 import { classifyAutofitContent } from '../utils/autofit/classify'
+import { AUTOFIT_DIAGNOSTIC_PREFIX } from '../utils/autofit/diagnostic-prefix'
 import {
   isAutofitClassificationSemanticallyEmpty,
 } from '../utils/autofit/semantic-content'
@@ -112,7 +113,7 @@ function warnInvalidConfiguration(): void {
 
   warnedConfigurationSignatures.add(signature)
   console.warn(
-    `[slidev-theme-umn-autolayout] AUTO IMAGE CONFIGURATION ERROR (${configError.value}); image and AutoFit regions are not mounted.`,
+    `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTO IMAGE CONFIGURATION ERROR (${configError.value}); image and AutoFit regions are not mounted.`,
   )
 }
 
@@ -126,7 +127,7 @@ function evaluateCenterProbe(): void {
   const nextUnsupported = !isAutofitClassificationSemanticallyEmpty(classification)
   if (nextUnsupported && !centerUnsupported.value) {
     console.warn(
-      '[slidev-theme-umn-autolayout] AUTO IMAGE UNSUPPORTED (center-with-auto-content): center mode cannot place substantive AutoFit content.',
+      `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTO IMAGE UNSUPPORTED (center-with-auto-content): center mode cannot place substantive AutoFit content.`,
     )
   }
   centerUnsupported.value = nextUnsupported
@@ -238,7 +239,7 @@ function evaluateSplitOverflow(generation: number): void {
   )
   if (overflow && !splitOverflow.value) {
     console.warn(
-      '[slidev-theme-umn-autolayout] AUTO IMAGE LAYOUT OVERFLOW (region-gap): image allocation plus the required region gap exceeds the remaining stage.',
+      `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTO IMAGE LAYOUT OVERFLOW (region-gap): image allocation plus the required region gap exceeds the remaining stage.`,
     )
   }
   splitOverflow.value = overflow

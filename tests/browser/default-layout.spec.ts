@@ -319,9 +319,10 @@ test('detects fixed vertical and horizontal overflow with layout diagnostics', a
 })
 
 test('reports each layout-overflow entry without duplicate observations', async ({ page }) => {
+  const layoutOverflowWarning = '[slidev-addon-autofit] LAYOUT OVERFLOW: fixed main/footer content exceeds the padded slide content box.'
   const warnings: string[] = []
   page.on('console', (message) => {
-    if (message.type() === 'warning' && message.text().includes('LAYOUT OVERFLOW'))
+    if (message.type() === 'warning' && message.text() === layoutOverflowWarning)
       warnings.push(message.text())
   })
 
@@ -336,6 +337,7 @@ test('reports each layout-overflow entry without duplicate observations', async 
   await expect(layout).toHaveAttribute('data-layout-overflow', 'true')
   await expect(layout.locator('.default-layout__overflow-badge')).toHaveText('LAYOUT OVERFLOW')
   await expect.poll(() => warnings.length).toBe(1)
+  expect(warnings[0]).toBe(layoutOverflowWarning)
 
   await probe.evaluate((element) => {
     element.setAttribute('data-repeat-observation', 'one')
@@ -355,6 +357,7 @@ test('reports each layout-overflow entry without duplicate observations', async 
   })
   await expect(layout).toHaveAttribute('data-layout-overflow', 'true')
   await expect.poll(() => warnings.length).toBe(2)
+  expect(warnings[1]).toBe(layoutOverflowWarning)
 })
 
 test('detects leading-side and top descendant overflow transitions at 0.5px tolerance', async ({ page }) => {
