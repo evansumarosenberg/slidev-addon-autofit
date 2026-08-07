@@ -319,7 +319,7 @@ const configuredTiers = { small: 4, large: 4 }
 | Paragraph | Semantic text unit |
 | Quote, code, table | Atomic unit |
 
-![Placeholder image](/images/placeholder.jpg){width=5%}
+![Placeholder image](/images/autofit_placeholder.jpg){width=5%}
 
 ---
 
@@ -344,7 +344,7 @@ const configuredTiers = { small: 4, large: 4 }
 | Paragraph | Semantic text unit |
 | Quote, code, table | Atomic unit |
 
-![Placeholder image](/images/placeholder.jpg){width=5%}
+![Placeholder image](/images/autofit_placeholder.jpg){width=5%}
 
 </v-clicks>
 
@@ -467,7 +467,7 @@ The default center position and `100%` size give this image the complete remaini
 
 ::image::
 
-![Placeholder image, centered at full size](/images/placeholder.jpg)
+![Placeholder image, centered at full size](/images/autofit_placeholder.jpg)
 
 ---
 layout: auto-image
@@ -482,7 +482,7 @@ The smaller centered allocation leaves equal blank space on both sides.
 
 ::image::
 
-![Placeholder image, centered at a smaller size](/images/placeholder.jpg)
+![Placeholder image, centered at a smaller size](/images/autofit_placeholder.jpg)
 
 Short centered caption.
 
@@ -499,7 +499,7 @@ This fixed explanation remains above the flexible image and AutoFit regions.
 
 ::image::
 
-![Placeholder image on the left](/images/placeholder.jpg)
+![Placeholder image on the left](/images/autofit_placeholder.jpg)
 
 Short left-image caption.
 
@@ -521,7 +521,7 @@ The right image and its longer caption reduce the space available to this denser
 
 ::image::
 
-![Placeholder image on the right](/images/placeholder.jpg)
+![Placeholder image on the right](/images/autofit_placeholder.jpg)
 
 This longer caption demonstrates that caption text is fixed content inside the image region and wraps at the region width before the image is fitted.
 
@@ -545,7 +545,7 @@ image:
 
 ::image::
 
-![Placeholder image above AutoFit](/images/placeholder.jpg)
+![Placeholder image above AutoFit](/images/autofit_placeholder.jpg)
 
 Top image caption.
 
@@ -570,7 +570,7 @@ image:
 
 ::image::
 
-![Placeholder image below AutoFit](/images/placeholder.jpg)
+![Placeholder image below AutoFit](/images/autofit_placeholder.jpg)
 
 Bottom image caption.
 
@@ -591,7 +591,7 @@ An explicitly declared empty `auto` slot mounts AutoFit and reserves the region 
 
 ::image::
 
-![Placeholder image beside an empty slot](/images/placeholder.jpg)
+![Placeholder image beside an empty slot](/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -608,7 +608,7 @@ With no declared `auto` slot, the full image allocation does not reserve an unne
 
 ::image::
 
-![Placeholder image without AutoFit](/images/placeholder.jpg)
+![Placeholder image without AutoFit](/images/autofit_placeholder.jpg)
 
 ---
 layout: auto-image
@@ -627,7 +627,7 @@ The image leaves a deliberately small AutoFit remainder. Expect the existing `AU
 
 ::image::
 
-![Placeholder image beside constrained AutoFit](/images/placeholder.jpg)
+![Placeholder image beside constrained AutoFit](/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -655,7 +655,7 @@ Only one direct Markdown image and an optional following caption are supported. 
 
 ::image::
 
-[![Linked placeholder image](/images/placeholder.jpg)](#)
+[![Linked placeholder image](/images/autofit_placeholder.jpg)](#)
 
 ::auto::
 
@@ -674,7 +674,7 @@ The managed image has no inline space, so expect `AUTO IMAGE OVERFLOW` while the
 
 ::image::
 
-![Placeholder image in a zero-width region](/images/placeholder.jpg)
+![Placeholder image in a zero-width region](/images/autofit_placeholder.jpg)
 
 ---
 layout: auto-image
@@ -689,7 +689,7 @@ The image keeps its full authoritative height while the declared AutoFit slot st
 
 ::image::
 
-![Placeholder image with no room for the gap](/images/placeholder.jpg)
+![Placeholder image with no room for the gap](/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -708,7 +708,7 @@ Center mode has no valid AutoFit placement. Substantive `auto` content should re
 
 ::image::
 
-![Placeholder image with unsupported center content](/images/placeholder.jpg)
+![Placeholder image with unsupported center content](/images/autofit_placeholder.jpg)
 
 ::auto::
 
@@ -728,13 +728,13 @@ uses the remaining region below it.
 
 ::image::
 
-![Top-row first placeholder](/images/placeholder.jpg)
+![Top-row first placeholder](/images/autofit_placeholder.jpg)
 
 Short caption for the first image.
 
-![Top-row second placeholder without a caption](/images/placeholder.jpg)
+![Top-row second placeholder without a caption](/images/autofit_placeholder.jpg)
 
-![Top-row third placeholder](/images/placeholder.jpg)
+![Top-row third placeholder](/images/autofit_placeholder.jpg)
 
 This longer third caption demonstrates that the adjacent second and third image roots omit the second caption.
 
@@ -763,9 +763,9 @@ captionless image group.
 
 ::image::
 
-![Bottom-row first placeholder](/images/placeholder.jpg)
+![Bottom-row first placeholder](/images/autofit_placeholder.jpg)
 
-![Bottom-row second placeholder](/images/placeholder.jpg)
+![Bottom-row second placeholder](/images/autofit_placeholder.jpg)
 
 ::footer::
 
@@ -785,11 +785,11 @@ different lengths.
 
 ::image::
 
-![Centered first placeholder](/images/placeholder.jpg)
+![Centered first placeholder](/images/autofit_placeholder.jpg)
 
 Brief first caption.
 
-![Centered second placeholder](/images/placeholder.jpg)
+![Centered second placeholder](/images/autofit_placeholder.jpg)
 
 This longer second caption wraps within its complete variable-width cell while the two images share one height.
 
@@ -806,11 +806,11 @@ This fixed context frames a two-image column beside ordinary AutoFit content.
 
 ::image::
 
-![Left-column first placeholder](/images/placeholder.jpg)
+![Left-column first placeholder](/images/autofit_placeholder.jpg)
 
 First caption spans the complete image region.
 
-![Left-column second placeholder](/images/placeholder.jpg)
+![Left-column second placeholder](/images/autofit_placeholder.jpg)
 
 The second caption is longer, but both column images share one fitted width.
 
@@ -834,13 +834,13 @@ summary.
 
 ::image::
 
-![Right-column first placeholder](/images/placeholder.jpg)
+![Right-column first placeholder](/images/autofit_placeholder.jpg)
 
 First caption remains associated by authored order.
 
-![Right-column second placeholder without a caption](/images/placeholder.jpg)
+![Right-column second placeholder without a caption](/images/autofit_placeholder.jpg)
 
-![Right-column third placeholder](/images/placeholder.jpg)
+![Right-column third placeholder](/images/autofit_placeholder.jpg)
 
 Third caption follows the third image.
 
@@ -859,11 +859,11 @@ layout: auto-image
 
 <v-clicks>
 
-![Centered first placeholder](/images/placeholder.jpg)
+![Centered first placeholder](/images/autofit_placeholder.jpg)
 
 Brief first caption.
 
-![Centered second placeholder](/images/placeholder.jpg)
+![Centered second placeholder](/images/autofit_placeholder.jpg)
 
 This longer second caption wraps within its complete variable-width cell while the two images share one height.
 
@@ -879,7 +879,7 @@ layout: auto-image
 
 <v-click>
 
-![Centered first placeholder](/images/placeholder.jpg)
+![Centered first placeholder](/images/autofit_placeholder.jpg)
 
 Brief first caption.
 
@@ -887,7 +887,7 @@ Brief first caption.
 
 <v-click>
 
-![Centered second placeholder](/images/placeholder.jpg)
+![Centered second placeholder](/images/autofit_placeholder.jpg)
 
 This longer second caption wraps within its complete variable-width cell while the two images share one height.
 
@@ -1235,7 +1235,7 @@ A Markdown comparison table and local University mark demonstrate mixed table an
 
 ::right::
 
-![Placeholder image](/images/placeholder.jpg){width=40%}
+![Placeholder image](/images/autofit_placeholder.jpg){width=40%}
 
 Use the local mark as a compact visual anchor beside the planning table.
 
