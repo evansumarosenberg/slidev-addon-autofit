@@ -6,7 +6,10 @@
   --slidev-auto-image-item-gap: 1rem;
   --slidev-auto-image-caption-font-size: 0.875rem;
   --slidev-auto-image-caption-line-height: 1.25rem;
-  --slidev-auto-image-caption-color: color-mix(in srgb, var(--slide-foreground) 70%, transparent);
+}
+
+.slidev-layout {
+  --slidev-auto-image-caption-color: color-mix(in srgb, currentColor 70%, transparent);
 }
 
 .slidev-layout.default.default-layout,
