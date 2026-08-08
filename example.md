@@ -851,6 +851,48 @@ Third caption follows the third image.
 layout: auto-image
 ---
 
+# Auto image  group: dense row
+
+::image::
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+Image caption wraps inside container
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+---
+layout: auto-image
+image:
+  position: left
+---
+
+# Auto image  group: dense column
+
+::image::
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+Image caption
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+![Placeholder image](/images/autofit_placeholder.jpg)
+
+---
+layout: auto-image
+---
+
 # Auto-image group: centered row with v-clicks
 
 ::image::
