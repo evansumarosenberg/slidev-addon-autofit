@@ -945,49 +945,62 @@ test('localizes one-sided and two-sided overflow at the atomic smallest tier', a
   }
 })
 
-test('atomically retains each healthy terminal beside empty and unsupported fallbacks', async ({ page }) => {
-  const cases = [
-    [55, ['fit', 'fit'], ['0', '0']],
-    [56, ['fit', 'fit'], ['0', '0']],
-    [57, ['unsupported', 'fit'], [null, '0']],
-    [58, ['unsupported', 'overflow'], [null, '-4']],
-    [59, ['unsupported', 'fit'], [null, '0']],
-    [60, ['unsupported', 'unsupported'], [null, null]],
-    [61, ['fit', 'unsupported'], ['0', null]],
-    [62, ['overflow', 'unsupported'], ['-4', null]],
-    [63, ['fit', 'unsupported'], ['0', null]],
-  ] as const
+type AtomicTerminalCase = {
+  readonly slide: number
+  readonly states: readonly [string, string]
+  readonly tiers: readonly [string | null, string | null]
+}
 
-  for (const [slide, states, tiers] of cases) {
-    await page.goto(`/${slide}`)
-    await installPublicationObserver(page)
-    await page.locator('[data-testid="start-coordination"]:visible').click()
-    const result = await waitForPair(page.locator('[data-testid="coordination-harness"]:visible'))
-    for (const index of [0, 1] as const) {
-      const role = result.nth(index)
-      await expect(role).toHaveAttribute('data-autofit-state', states[index])
-      if (tiers[index] === null) {
-        await expect(role).not.toHaveAttribute('data-autofit-tier')
-        await expect(role).not.toHaveAttribute('data-autofit-scale')
-        await expect(role).toHaveAttribute('data-autofit-effective-alignment', 'top')
-        await expect(role.locator('.autofit__unsupported-badge')).toHaveCount(1)
-      }
-      else {
-        await expect(role).toHaveAttribute('data-autofit-tier', tiers[index])
-        await expect(role).toHaveAttribute('data-autofit-scale', tiers[index] === '0' ? '1' : '0.6')
-      }
+const atomicTerminalCases: readonly AtomicTerminalCase[] = [
+  { slide: 55, states: ['fit', 'fit'], tiers: ['0', '0'] },
+  { slide: 56, states: ['fit', 'fit'], tiers: ['0', '0'] },
+  { slide: 57, states: ['unsupported', 'fit'], tiers: [null, '0'] },
+  { slide: 58, states: ['unsupported', 'overflow'], tiers: [null, '-4'] },
+  { slide: 59, states: ['unsupported', 'fit'], tiers: [null, '0'] },
+  { slide: 60, states: ['unsupported', 'unsupported'], tiers: [null, null] },
+  { slide: 61, states: ['fit', 'unsupported'], tiers: ['0', null] },
+  { slide: 62, states: ['overflow', 'unsupported'], tiers: ['-4', null] },
+  { slide: 63, states: ['fit', 'unsupported'], tiers: ['0', null] },
+]
+
+async function expectAtomicTerminal(
+  page: Page,
+  { slide, states, tiers }: AtomicTerminalCase,
+): Promise<void> {
+  await page.goto(`/${slide}`)
+  await installPublicationObserver(page)
+  await page.locator('[data-testid="start-coordination"]:visible').click()
+  const result = await waitForPair(page.locator('[data-testid="coordination-harness"]:visible'))
+  for (const index of [0, 1] as const) {
+    const role = result.nth(index)
+    await expect(role).toHaveAttribute('data-autofit-state', states[index])
+    if (tiers[index] === null) {
+      await expect(role).not.toHaveAttribute('data-autofit-tier')
+      await expect(role).not.toHaveAttribute('data-autofit-scale')
+      await expect(role).toHaveAttribute('data-autofit-effective-alignment', 'top')
+      await expect(role.locator('.autofit__unsupported-badge')).toHaveCount(1)
     }
-    if (slide === 55)
-      await expect(result.nth(0)).toHaveAttribute('data-autofit-empty', 'true')
-    if (slide === 56) {
-      for (const role of await result.all())
-        await expect(role).toHaveAttribute('data-autofit-empty', 'true')
+    else {
+      await expect(role).toHaveAttribute('data-autofit-tier', tiers[index])
+      await expect(role).toHaveAttribute('data-autofit-scale', tiers[index] === '0' ? '1' : '0.6')
     }
-    if (slide === 63)
-      await expect(result.nth(0)).toHaveAttribute('data-autofit-empty', 'true')
-    await expectOnlyAtomicPublication(page)
   }
-})
+  if (slide === 55)
+    await expect(result.nth(0)).toHaveAttribute('data-autofit-empty', 'true')
+  if (slide === 56) {
+    for (const role of await result.all())
+      await expect(role).toHaveAttribute('data-autofit-empty', 'true')
+  }
+  if (slide === 63)
+    await expect(result.nth(0)).toHaveAttribute('data-autofit-empty', 'true')
+  await expectOnlyAtomicPublication(page)
+}
+
+for (const terminalCase of atomicTerminalCases) {
+  test(`atomically retains each healthy terminal beside empty and unsupported fallbacks (slide ${terminalCase.slide})`, async ({ page }) => {
+    await expectAtomicTerminal(page, terminalCase)
+  })
+}
 
 test('keeps empty state role-local beside managed and overflow terminals', async ({ page }) => {
   const cases = [
