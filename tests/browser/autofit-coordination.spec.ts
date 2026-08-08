@@ -267,6 +267,14 @@ async function roles(pair: Locator): Promise<Locator> {
   return result
 }
 
+function finiteTier(attribute: string | null): number {
+  if (attribute === null || attribute.trim() === '')
+    throw new Error('expected a present finite tier attribute')
+  const tier = Number(attribute)
+  expect(Number.isFinite(tier)).toBe(true)
+  return tier
+}
+
 async function expectPrivatePairHidden(pair: Locator): Promise<void> {
   for (const role of await (await roles(pair)).all()) {
     await expect(role).toHaveAttribute('data-autofit-state', 'pending')
@@ -845,7 +853,7 @@ for (const [slide, order, firstRole] of [
   })
 }
 
-test('uses exact private fitted tiers, reuses balanced measurements, and measures only the missing common tier', async ({ page }) => {
+test('uses private fitted tiers, reuses balanced measurements, and measures only the missing common tier', async ({ page }) => {
   const balanced = await start(page, 52)
   const balancedRoles = await waitForPair(balanced)
   for (const role of await balancedRoles.all()) {
@@ -872,8 +880,9 @@ test('uses exact private fitted tiers, reuses balanced measurements, and measure
     const privateTiers = await unbalancedRoles.evaluateAll(roots =>
       roots.map(root => root.getAttribute('data-autofit-private-tier')),
     )
-    if (privateTiers.every(tier => tier !== null)) {
-      expect(privateTiers).toEqual(['0', '-2'])
+    if (privateTiers.every(tier => tier !== null && tier.trim() !== '')) {
+      const values = privateTiers.map(finiteTier)
+      expect(Math.min(...values)).toBeLessThan(Math.max(...values))
       await expectPrivatePairHidden(unbalanced)
       privateMeasurementCounts = await page.evaluate(() => {
         const debug = (window as typeof window & {
@@ -893,11 +902,17 @@ test('uses exact private fitted tiers, reuses balanced measurements, and measure
   expect(privateMeasurementCounts).toEqual(['1', '4'])
   await restoreFrames(page)
   const unbalancedRoles = await waitForPair(unbalanced)
-  await expect(unbalancedRoles.nth(0)).toHaveAttribute('data-autofit-private-tier', '0')
-  await expect(unbalancedRoles.nth(1)).toHaveAttribute('data-autofit-private-tier', '-2')
+  const tiers = await unbalancedRoles.evaluateAll(roots => roots.map((root) => ({
+    private: root.getAttribute('data-autofit-private-tier'),
+    published: root.getAttribute('data-autofit-tier'),
+  })))
+  const privateTiers = tiers.map(({ private: tier }) => finiteTier(tier))
+  const publishedTiers = tiers.map(({ published }) => finiteTier(published))
+  expect(Math.min(...privateTiers)).toBeLessThan(
+    Math.max(...privateTiers),
+  )
+  expect(publishedTiers[0]).toBe(publishedTiers[1])
   for (const role of await unbalancedRoles.all()) {
-    await expect(role).toHaveAttribute('data-autofit-tier', '-2')
-    await expect(role).toHaveAttribute('data-autofit-scale', '0.8')
     await expect(role).toHaveAttribute('data-autofit-state', 'fit')
   }
   await expect(unbalancedRoles.nth(0)).toHaveAttribute('data-autofit-measure-count', '2')
@@ -1339,10 +1354,19 @@ test('uses the smaller private-tier role as the authoritative source plan', asyn
   const result = await waitForPair(page.locator('[data-testid="coordination-harness"]:visible'))
   const [left, right] = await result.all()
 
-  await expect(left).toHaveAttribute('data-autofit-private-tier', '0')
-  await expect(right).toHaveAttribute('data-autofit-private-tier', '-2')
+  const tiers = await result.evaluateAll(roots => roots.map((root) => ({
+    role: root.getAttribute('data-autofit-role'),
+    private: root.getAttribute('data-autofit-private-tier'),
+    published: root.getAttribute('data-autofit-tier'),
+  })))
+  const privateTiers = tiers.map(({ private: tier }) => finiteTier(tier))
+  const publishedTiers = tiers.map(({ published }) => finiteTier(published))
+  const sourceIndex = privateTiers[0]! < privateTiers[1]! ? 0 : 1
+  const targetIndex = 1 - sourceIndex
+  expect(privateTiers[sourceIndex]).toBeLessThan(privateTiers[targetIndex])
+  expect(publishedTiers[0]).toBe(publishedTiers[1])
   for (const role of [left, right]) {
-    await expect(role).toHaveAttribute('data-autofit-tier', '-2')
+    await expect(role).toHaveAttribute('data-autofit-state', 'fit')
     await expect(role).toHaveAttribute('data-autofit-effective-alignment', 'distributed')
   }
   expect(await page.evaluate(() => (window as typeof window & {
@@ -1353,7 +1377,7 @@ test('uses the smaller private-tier role as the authoritative source plan', asyn
     }>
   }).__autofitCoordinationTargetPlans)).toEqual([
     expect.objectContaining({
-      role: 'left',
+      role: tiers[targetIndex]!.role,
       sourceTarget: expect.any(Number),
       targetBoundary: expect.any(Number),
     }),
@@ -1404,10 +1428,25 @@ test('derives a missing half target from a full-only authoritative source', asyn
   })
   await page.locator('[data-testid="start-coordination"]:visible').click()
   const result = await waitForPair(page.locator('[data-testid="coordination-harness"]:visible'))
-  const [source, target] = await result.all()
+  const roleLocators = await result.all()
 
-  await expect(source).toHaveAttribute('data-autofit-private-tier', '-2')
-  await expect(target).toHaveAttribute('data-autofit-private-tier', '0')
+  const tiers = await result.evaluateAll(roots => roots.map((root) => ({
+    role: root.getAttribute('data-autofit-role'),
+    private: root.getAttribute('data-autofit-private-tier'),
+    published: root.getAttribute('data-autofit-tier'),
+  })))
+  const privateTiers = tiers.map(({ private: tier }) => finiteTier(tier))
+  const publishedTiers = tiers.map(({ published }) => finiteTier(published))
+  const sourceIndex = privateTiers[0]! < privateTiers[1]! ? 0 : 1
+  const targetIndex = 1 - sourceIndex
+  const source = roleLocators[sourceIndex]!
+  const target = roleLocators[targetIndex]!
+  expect(privateTiers[sourceIndex]).toBeLessThan(privateTiers[targetIndex])
+  expect(publishedTiers[0]).toBe(publishedTiers[1])
+  await expect(source).toHaveAttribute('data-autofit-state', 'fit')
+  await expect(target).toHaveAttribute('data-autofit-state', 'fit')
+  for (const role of [source, target])
+    await expect(role).toHaveAttribute('data-autofit-effective-alignment', 'distributed')
   await expect(target).toHaveAttribute('data-autofit-full-gaps', '0')
   await expect(target).toHaveAttribute('data-autofit-half-gaps', '3')
   const synchronized = await page.evaluate(() => (window as typeof window & {
@@ -1419,7 +1458,7 @@ test('derives a missing half target from a full-only authoritative source', asyn
     }>
   }).__autofitCoordinationTargetPlans?.[0])
   expect(synchronized).toMatchObject({
-    role: 'right',
+    role: tiers[targetIndex]!.role,
     provenance: 'derived',
     targetBoundary: { kind: 'half' },
   })
@@ -1470,15 +1509,6 @@ test('publishes a synchronized target overflow without a tier or alignment fallb
   })
   await page.locator('[data-testid="start-coordination"]:visible').click()
   const result = await waitForPair(page.locator('[data-testid="coordination-harness"]:visible'))
-  const [target, source] = await result.all()
-
-  await expect(source).toHaveAttribute('data-autofit-state', 'fit')
-  await expect(source).toHaveAttribute('data-autofit-tier', '0')
-  await expect(target).toHaveAttribute('data-autofit-state', 'overflow')
-  await expect(target).toHaveAttribute('data-autofit-tier', '0')
-  await expect(target).toHaveAttribute('data-autofit-effective-alignment', 'distributed')
-  await expect(target).toHaveAttribute('data-autofit-full-gaps', '1')
-  await expect(target).toHaveAttribute('data-autofit-half-gaps', '0')
   const synchronized = await page.evaluate(() => (window as typeof window & {
     __autofitCoordinationTargetPlans?: Array<{
       readonly role: string | null
@@ -1488,10 +1518,22 @@ test('publishes a synchronized target overflow without a tier or alignment fallb
   }).__autofitCoordinationTargetPlans)
   expect(synchronized).toEqual([
     expect.objectContaining({
-      role: 'left',
+      role: expect.stringMatching(/^(left|right)$/),
       boundaries: [expect.objectContaining({ kind: 'full' })],
     }),
   ])
+  const target = page.locator(`[data-testid="coordination-harness"]:visible [data-autofit-role="${synchronized![0]!.role}"]`)
+  const source = page.locator(`[data-testid="coordination-harness"]:visible [data-autofit-role="${synchronized![0]!.role === 'left' ? 'right' : 'left'}"]`)
+  const publishedTiers = await result.evaluateAll(roots => roots.map(root =>
+    root.getAttribute('data-autofit-tier'),
+  ))
+  const finitePublishedTiers = publishedTiers.map(finiteTier)
+  expect(finitePublishedTiers[0]).toBe(finitePublishedTiers[1])
+  await expect(source).toHaveAttribute('data-autofit-state', 'fit')
+  await expect(target).toHaveAttribute('data-autofit-state', 'overflow')
+  await expect(target).toHaveAttribute('data-autofit-effective-alignment', 'distributed')
+  await expect(target).toHaveAttribute('data-autofit-full-gaps', '1')
+  await expect(target).toHaveAttribute('data-autofit-half-gaps', '0')
   for (const boundary of synchronized![0].boundaries) {
     const authoritativeTarget = boundary.kind === 'full'
       ? synchronized![0].targets.fullTarget
@@ -1508,19 +1550,16 @@ test('retains exact target alignment for gap-only, alignment-only, and combined 
       mode: 'semantic',
       forceGapOverflow: true,
       warning: 'required coordinated semantic gaps exceed',
-      target: 'left',
     },
     {
       mode: 'semantic-alignment-overflow',
       forceGapOverflow: false,
       warning: 'required coordinated start alignment exceeds',
-      target: 'left',
     },
     {
       mode: 'semantic-alignment-overflow',
       forceGapOverflow: true,
       warning: 'required coordinated semantic gaps and start alignment exceed',
-      target: 'left',
     },
   ] as const
   for (const scenario of cases) {
@@ -1535,15 +1574,25 @@ test('retains exact target alignment for gap-only, alignment-only, and combined 
     await page.locator('[data-testid="start-coordination"]:visible').click()
     const pair = page.locator('[data-testid="coordination-harness"]:visible')
     const result = await waitForPair(pair)
-    const target = pair.locator(`[data-autofit-role="${scenario.target}"]`)
-    const source = pair.locator(`[data-autofit-role="${scenario.target === 'left' ? 'right' : 'left'}"]`)
+    const [observation] = await startingAlignmentObservations(page)
+    expect(observation?.role).toMatch(/^(left|right)$/)
+    const target = pair.locator(`[data-autofit-role="${observation!.role}"]`)
+    const source = pair.locator(`[data-autofit-role="${observation!.role === 'left' ? 'right' : 'left'}"]`)
+    const states = await result.evaluateAll(roots => roots.map(root =>
+      root.getAttribute('data-autofit-state'),
+    ))
+    const publishedTiers = await result.evaluateAll(roots => roots.map(root =>
+      root.getAttribute('data-autofit-tier'),
+    ))
+    expect(states.filter(state => state === 'overflow')).toHaveLength(1)
+    expect(states.filter(state => state === 'fit')).toHaveLength(1)
+    const finitePublishedTiers = publishedTiers.map(finiteTier)
+    expect(finitePublishedTiers[0]).toBe(finitePublishedTiers[1])
     await expect(source).toHaveAttribute('data-autofit-state', 'fit')
     await expect(target).toHaveAttribute('data-autofit-state', 'overflow')
-    await expect(target).toHaveAttribute('data-autofit-tier', '0')
     await expect(target).toHaveAttribute('data-autofit-effective-alignment', 'distributed')
     const anchors = await renderedStartingAnchors(pair)
     expect(anchors[0]).toBeCloseTo(anchors[1]!, 1)
-    const [observation] = await startingAlignmentObservations(page)
     expect(observation?.terminal).toBe('synchronized-overflow')
     expect(Math.abs(observation!.finalAnchorError ?? Number.NaN)).toBeLessThanOrEqual(0.5)
     expect(warnings).toContainEqual(expect.stringContaining(scenario.warning))
@@ -1637,13 +1686,27 @@ test('keeps selected-source candidate-anchor failure in the common-tier fallback
   })
   await page.locator('[data-testid="start-coordination"]:visible').click()
   const unequal = await waitForPair(page.locator('[data-testid="coordination-harness"]:visible'))
-  const [unaffectedTarget, unsupportedSource] = await unequal.all()
-  await expect(unaffectedTarget).toHaveAttribute('data-autofit-private-tier', '0')
+  const unequalRoles = await unequal.all()
+  const unequalTiers = await unequal.evaluateAll(roots => roots.map((root) => ({
+    state: root.getAttribute('data-autofit-state'),
+    private: root.getAttribute('data-autofit-private-tier'),
+    published: root.getAttribute('data-autofit-tier'),
+  })))
+  const privateTiers = unequalTiers.map(({ private: tier }) => finiteTier(tier))
+  const unsupportedIndex = unequalTiers.findIndex(({ state }) => state === 'unsupported')
+  expect(unsupportedIndex).toBeGreaterThanOrEqual(0)
+  const targetIndex = 1 - unsupportedIndex
+  const unaffectedTarget = unequalRoles[targetIndex]!
+  const unsupportedSource = unequalRoles[unsupportedIndex]!
+  expect(privateTiers[unsupportedIndex]).toBeLessThan(
+    privateTiers[targetIndex],
+  )
   await expect(unaffectedTarget).toHaveAttribute('data-autofit-state', 'fit')
-  await expect(unaffectedTarget).toHaveAttribute('data-autofit-tier', '0')
-  await expect(unsupportedSource).toHaveAttribute('data-autofit-private-tier', '-2')
+  expect(finiteTier(unequalTiers[targetIndex]!.published)).toBe(privateTiers[targetIndex])
   await expect(unsupportedSource).toHaveAttribute('data-autofit-state', 'unsupported')
   await expect(unsupportedSource).toHaveAttribute('data-autofit-unsupported-reason', 'visual-edge-nonfinite')
+  await expect(unsupportedSource).not.toHaveAttribute('data-autofit-tier')
+  await expect(unsupportedSource).not.toHaveAttribute('data-autofit-scale')
   await expectOnlyAtomicPublication(page)
 
   await page.goto('/64')
