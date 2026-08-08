@@ -52,7 +52,7 @@ const transitionHeight = ref(140)
       <p>There is no image here.</p>
     </AutoImage>
 
-    <AutoImage data-testid="auto-image-multiple" style="width: 180px; height: 120px">
+    <AutoImage data-testid="auto-image-multiple" style="width: 600px; height: 240px">
       <img data-testid="auto-image-multiple-first" :src="landscapeSource" alt="First">
       <p data-testid="auto-image-multiple-first-caption">First caption.</p>
       <p><img data-testid="auto-image-multiple-second" :src="squareSource" alt="Second"></p>
@@ -129,7 +129,7 @@ const transitionHeight = ref(140)
     <AutoImage
       v-if="showMultiUnmount"
       data-testid="auto-image-multiple-unmount"
-      style="width: 240px; height: 180px"
+      style="width: 680px; height: 240px"
     >
       <img data-testid="auto-image-multiple-unmount-first" :src="landscapeSource" alt="Unmount first">
       <p>Unmount first caption.</p>
@@ -349,7 +349,7 @@ const transitionHeight = ref(140)
     <AutoImage
       v-if="showFiniteRowInitial"
       data-testid="auto-image-finite-row-initial"
-      style="width: 240px; height: 180px"
+      style="width: 600px; height: 240px"
     >
       <img :src="landscapeSource" alt="Initial row landscape fixture">
       <p>Initial row landscape caption.</p>

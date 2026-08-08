@@ -47,12 +47,14 @@ const positions = ['top', 'bottom', 'center', 'left', 'right'] as const
 <style scoped>
 .auto-image-reveal-harness {
   display: grid;
-  grid-template-columns: repeat(3, 240px);
+  grid-template-columns: repeat(3, 520px);
   gap: 16px;
 }
 
 .auto-image-reveal-harness__item {
-  width: 240px;
-  height: 180px;
+  width: 520px;
+  height: 300px;
+  --slidev-auto-image-caption-font-size: 12px;
+  --slidev-auto-image-caption-line-height: 16px;
 }
 </style>
