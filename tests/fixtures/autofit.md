@@ -3053,3 +3053,7 @@ transition: none
 # AutoFit transition unmount retention
 
 <AutofitTransitionUnmountHarness />
+
+---
+
+<AutoImageLayoutRawConfigHarness />

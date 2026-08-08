@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test'
 import type { Locator, Page } from '@playwright/test'
 import {
   waitForAnimationFrames,
+  waitForAutofitLifecycleIdle,
+  waitForAutofitPublication,
   waitForPageAssets,
 } from './helpers/autofit-settle'
 
@@ -120,6 +122,7 @@ async function headingStyles(locator: Locator) {
 
 const AUTO_IMAGE_REVEAL_SLIDE = 158
 const AUTO_IMAGE_REVEAL_CLICKS = 42
+const AUTO_IMAGE_RAW_CONFIG_HARNESS_SLIDE = 161
 
 type RevealRect = { readonly x: number, readonly y: number, readonly width: number, readonly height: number }
 
@@ -1289,54 +1292,76 @@ test('reclassifies a declared center probe from empty to substantive and back', 
 
 test('forwards raw AutoFit configuration across every non-center position', async ({ page }) => {
   const cases = [
-    ['left', 'omitted', 125, 'auto-image-bridge-left-omitted', 'distributed', 'distributed', '4', '1.4', false],
-    ['right', 'default', 126, 'auto-image-bridge-right-default', 'distributed', 'distributed', '4', '1.4', false],
-    ['top', 'partial', 127, 'auto-image-bridge-top-partial', 'bottom', 'bottom', '4', '1.4', false],
-    ['bottom', 'custom', 128, 'auto-image-bridge-bottom-custom', 'center', 'middle', '0', '1', false],
-    ['left', 'invalid', 129, 'auto-image-bridge-left-invalid', 'distributed', 'distributed', '4', '1.4', true],
-    ['right', 'omitted', 130, 'auto-image-bridge-right-omitted', 'distributed', 'distributed', '4', '1.4', false],
-    ['top', 'default', 131, 'auto-image-bridge-top-default', 'distributed', 'distributed', '4', '1.4', false],
-    ['bottom', 'partial', 132, 'auto-image-bridge-bottom-partial', 'bottom', 'bottom', '4', '1.4', false],
-    ['left', 'custom', 133, 'auto-image-bridge-left-custom', 'center', 'middle', '0', '1', false],
-    ['right', 'invalid', 134, 'auto-image-bridge-right-invalid', 'distributed', 'distributed', '4', '1.4', true],
-    ['top', 'omitted', 135, 'auto-image-bridge-top-omitted', 'distributed', 'distributed', '4', '1.4', false],
-    ['bottom', 'default', 136, 'auto-image-bridge-bottom-default', 'distributed', 'distributed', '4', '1.4', false],
-    ['left', 'partial', 137, 'auto-image-bridge-left-partial', 'bottom', 'bottom', '4', '1.4', false],
-    ['right', 'custom', 138, 'auto-image-bridge-right-custom', 'center', 'middle', '0', '1', false],
-    ['top', 'invalid', 139, 'auto-image-bridge-top-invalid', 'distributed', 'distributed', '4', '1.4', true],
-    ['bottom', 'omitted', 140, 'auto-image-bridge-bottom-omitted', 'distributed', 'distributed', '4', '1.4', false],
-    ['left', 'default', 141, 'auto-image-bridge-left-default', 'distributed', 'distributed', '4', '1.4', false],
-    ['right', 'partial', 142, 'auto-image-bridge-right-partial', 'bottom', 'bottom', '4', '1.4', false],
-    ['top', 'custom', 143, 'auto-image-bridge-top-custom', 'center', 'middle', '0', '1', false],
-    ['bottom', 'invalid', 144, 'auto-image-bridge-bottom-invalid', 'distributed', 'distributed', '4', '1.4', true],
+    ['left', 'omitted', 'distributed', 'distributed', '4', '1.4', false, 'undefined:undefined'],
+    ['right', 'default', 'distributed', 'distributed', '4', '1.4', false, '[object Object]{}'],
+    ['top', 'partial', 'bottom', 'bottom', '4', '1.4', false, '[object Object]{alignment:string:bottom}'],
+    ['bottom', 'custom', 'center', 'middle', '0', '1', false, '[object Object]{alignment:string:center,largeTiers:number:0,smallTiers:number:0,tierIncrement:number:10}'],
+    ['left', 'invalid', 'distributed', 'distributed', '4', '1.4', true, '[object Object]{alignment:string:top,largeTiers:number:1,smallTiers:number:-1,tierIncrement:number:10}'],
+    ['right', 'omitted', 'distributed', 'distributed', '4', '1.4', false, 'undefined:undefined'],
+    ['top', 'default', 'distributed', 'distributed', '4', '1.4', false, '[object Object]{}'],
+    ['bottom', 'partial', 'bottom', 'bottom', '4', '1.4', false, '[object Object]{alignment:string:bottom}'],
+    ['left', 'custom', 'center', 'middle', '0', '1', false, '[object Object]{alignment:string:center,largeTiers:number:0,smallTiers:number:0,tierIncrement:number:10}'],
+    ['right', 'invalid', 'distributed', 'distributed', '4', '1.4', true, '[object Object]{alignment:string:top,largeTiers:number:2,smallTiers:number:-1,tierIncrement:number:10}'],
+    ['top', 'omitted', 'distributed', 'distributed', '4', '1.4', false, 'undefined:undefined'],
+    ['bottom', 'default', 'distributed', 'distributed', '4', '1.4', false, '[object Object]{}'],
+    ['left', 'partial', 'bottom', 'bottom', '4', '1.4', false, '[object Object]{alignment:string:bottom}'],
+    ['right', 'custom', 'center', 'middle', '0', '1', false, '[object Object]{alignment:string:center,largeTiers:number:0,smallTiers:number:0,tierIncrement:number:10}'],
+    ['top', 'invalid', 'distributed', 'distributed', '4', '1.4', true, '[object Object]{alignment:string:top,largeTiers:number:3,smallTiers:number:-1,tierIncrement:number:10}'],
+    ['bottom', 'omitted', 'distributed', 'distributed', '4', '1.4', false, 'undefined:undefined'],
+    ['left', 'default', 'distributed', 'distributed', '4', '1.4', false, '[object Object]{}'],
+    ['right', 'partial', 'bottom', 'bottom', '4', '1.4', false, '[object Object]{alignment:string:bottom}'],
+    ['top', 'custom', 'center', 'middle', '0', '1', false, '[object Object]{alignment:string:center,largeTiers:number:0,smallTiers:number:0,tierIncrement:number:10}'],
+    ['bottom', 'invalid', 'distributed', 'distributed', '4', '1.4', true, '[object Object]{alignment:string:top,largeTiers:number:5,smallTiers:number:-1,tierIncrement:number:10}'],
   ] as const
 
-  for (const [, , slide, marker, requested, effective, tier, scale, invalid] of cases) {
+  await openSlide(page, AUTO_IMAGE_RAW_CONFIG_HARNESS_SLIDE, 'auto-image-layout-raw-config-harness')
+  await waitForPageAssets(page)
+  await waitForAutofitLifecycleIdle(page)
+  const harness = page.getByTestId('auto-image-layout-raw-config-harness')
+
+  for (const [position, configuration, requested, effective, tier, scale, invalid, rawConfiguration] of cases) {
     const warnings: string[] = []
-    page.on('console', (message) => {
-      if (message.type() === 'warning' && message.text().includes('AUTOFIT CONFIGURATION'))
+    const onConsole = (message: { type(): string, text(): string }) => {
+      if (
+        message.type() === 'warning'
+        && message.text().includes(`AUTOFIT CONFIGURATION ERROR (${rawConfiguration}::`)
+      ) {
         warnings.push(message.text())
-    })
-    await openSlide(page, slide, marker)
-    const autofit = layoutFor(page, marker).locator('.autofit')
-    await expect(autofit).toHaveAttribute('data-autofit-requested-alignment', requested)
-    await expect(autofit).toHaveAttribute('data-autofit-effective-alignment', effective)
-    await expect(autofit).toHaveAttribute('data-autofit-tier', tier)
-    await expect(autofit).toHaveAttribute('data-autofit-scale', scale)
-    if (invalid) {
-      await expect(autofit).toHaveClass(/autofit--config-error/)
-      await expect(autofit).toHaveAttribute('data-autofit-config-error', 'invalid-small-tiers')
-      await expect.poll(() => warnings.length).toBe(1)
-      expect(warnings[0]).toMatch(
-        /^\[slidev-addon-autofit\] AUTOFIT CONFIGURATION ERROR \(/,
-      )
-      expect(warnings[0]).toContain('AUTOFIT CONFIGURATION ERROR')
-      expect(warnings[0]).toContain('invalid-small-tiers')
-      expect(warnings[0]).toContain('using complete defaults.')
+      }
     }
-    else {
-      await expect(autofit).not.toHaveClass(/autofit--config-error/)
-      await expect(autofit).not.toHaveAttribute('data-autofit-config-error')
+    page.on('console', onConsole)
+
+    try {
+      await harness.getByTestId(`auto-image-layout-raw-config-case-${position}-${configuration}`).click()
+      const marker = harness.getByTestId('auto-image-layout-raw-config-case-marker')
+      await expect(marker).toHaveAttribute('data-auto-image-layout-raw-config-case', `${position}-${configuration}`)
+      const autofit = layoutFor(page, 'auto-image-layout-raw-config-case-marker').locator('.autofit')
+      await waitForAutofitPublication(autofit)
+      await expect(autofit).toHaveAttribute('data-autofit-requested-alignment', requested)
+      await expect(autofit).toHaveAttribute('data-autofit-effective-alignment', effective)
+      await expect(autofit).toHaveAttribute('data-autofit-tier', tier)
+      await expect(autofit).toHaveAttribute('data-autofit-scale', scale)
+      if (invalid) {
+        await expect(autofit).toHaveClass(/autofit--config-error/)
+        await expect(autofit).toHaveAttribute('data-autofit-config-error', 'invalid-small-tiers')
+        await expect.poll(() => warnings.length).toBe(1)
+        const warning = warnings[0]
+        expect(warning).toMatch(
+          /^\[slidev-addon-autofit\] AUTOFIT CONFIGURATION ERROR \(/,
+        )
+        expect(warning).toContain('AUTOFIT CONFIGURATION ERROR')
+        expect(warning).toContain('invalid-small-tiers')
+        expect(warning).toContain('using complete defaults.')
+        expect(warning).toContain(rawConfiguration)
+      }
+      else {
+        await expect(autofit).not.toHaveClass(/autofit--config-error/)
+        await expect(autofit).not.toHaveAttribute('data-autofit-config-error')
+        expect(warnings).toEqual([])
+      }
+    }
+    finally {
+      page.off('console', onConsole)
     }
   }
 })
