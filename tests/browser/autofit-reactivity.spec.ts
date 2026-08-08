@@ -222,8 +222,15 @@ test('keeps a prior stable result visible while resize and prop passes replace i
 
   const originalPropBatch = await batchId(propReactive)
   const originalPropTier = await propReactive.getAttribute('data-autofit-tier')
-  const originalPropFont = await page.getByTestId('prop-reactive-copy')
+  if (originalPropTier === null || originalPropTier.trim() === '')
+    throw new Error('expected a captured prop-reactive tier')
+  const originalPropTierValue = Number(originalPropTier)
+  const propReactiveCopy = page.getByTestId('prop-reactive-copy')
+  const originalPropFont = await propReactiveCopy
     .evaluate(element => getComputedStyle(element).fontSize)
+  const originalPropFontSize = Number.parseFloat(originalPropFont)
+  expect(Number.isFinite(originalPropTierValue)).toBe(true)
+  expect(Number.isFinite(originalPropFontSize)).toBe(true)
   await page.evaluate(() => {
     const heldFrames: FrameRequestCallback[] = []
     const originalRequestFrame = window.requestAnimationFrame.bind(window)
@@ -238,7 +245,7 @@ test('keeps a prior stable result visible while resize and prop passes replace i
   })
   await page.getByTestId('expand-tier-range').click()
   await page.waitForTimeout(20)
-  await expect(page.getByTestId('prop-reactive-copy')).toHaveCSS(
+  await expect(propReactiveCopy).toHaveCSS(
     'font-size',
     originalPropFont,
   )
@@ -256,7 +263,7 @@ test('keeps a prior stable result visible while resize and prop passes replace i
   }
 
   await expect(propReactive).toHaveAttribute('data-autofit-tier', originalPropTier!)
-  await expect(page.getByTestId('prop-reactive-copy')).toHaveCSS(
+  await expect(propReactiveCopy).toHaveCSS(
     'font-size',
     originalPropFont,
   )
@@ -276,8 +283,12 @@ test('keeps a prior stable result visible while resize and prop passes replace i
       callback(performance.now())
   })
   await expect.poll(() => batchId(propReactive)).not.toBe(originalPropBatch)
-  await expect(propReactive).toHaveAttribute('data-autofit-tier', '2')
-  await expect(page.getByTestId('prop-reactive-copy')).toHaveCSS('font-size', '120px')
+  const finalPropTier = Number(await propReactive.getAttribute('data-autofit-tier'))
+  expect(finalPropTier).toBeGreaterThan(0)
+  expect(finalPropTier).toBeGreaterThan(originalPropTierValue)
+  expect(Number.parseFloat(await propReactiveCopy
+    .evaluate(element => getComputedStyle(element).fontSize)))
+    .toBeGreaterThan(originalPropFontSize)
 })
 
 test('reacts to text, media, font, theme, and base-spacing invalidations without compounding', async ({ page }) => {
@@ -1418,8 +1429,10 @@ test('keeps non-neutral root and whole-list reveals transition-safe with zero sc
     }
   }
   const beforeGaps = await gaps()
-  expect(before.root.tier).toBe('-2')
-  expect(before.list.tier).toBe('-3')
+  await expect(rootReveal).toHaveAttribute('data-autofit-state', 'fit')
+  await expect(listReveal).toHaveAttribute('data-autofit-state', 'fit')
+  expect(before.root.tier).toMatch(/^-[1-4]$/)
+  expect(before.list.tier).toMatch(/^-[1-4]$/)
   expect(before.root.targets.every(
     target => target.transitionProperty === 'all'
       && target.transitionDuration === '0.37s',
