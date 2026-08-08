@@ -2,8 +2,8 @@
   --slidev-autofit-base-spacing: 1rem;
   --slidev-autofit-diagnostic-color: #7a0019;
   --slidev-auto-image-region-gap: 1rem;
-  --slidev-auto-image-caption-gap: 1rem;
-  --slidev-auto-image-item-gap: 1rem;
+  --slidev-auto-image-caption-gap: 0.5rem;
+  --slidev-auto-image-item-gap: 1.25rem;
   --slidev-auto-image-caption-font-size: 0.875rem;
   --slidev-auto-image-caption-line-height: 1.25rem;
 }
