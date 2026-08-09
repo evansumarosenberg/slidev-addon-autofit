@@ -1221,25 +1221,25 @@ test('keeps fixed overflow diagnostics visible while suppressing inner diagnosti
   await expect.poll(() => warnings.filter(message => message.includes('AUTOFIT OVERFLOW')).length).toBeGreaterThan(0)
 })
 
-test('classifies every declared center probe branch without geometry or paint', async ({ page }) => {
-  const cases = [
-    { slide: 105, marker: 'auto-image-center', substantive: false, declared: false },
-    { slide: 119, marker: 'auto-image-center-whitespace', substantive: false, declared: true },
-    { slide: 120, marker: 'auto-image-center-comment', substantive: false, declared: true },
-    { slide: 121, marker: 'auto-image-center-sentinel', substantive: false, declared: true },
-    { slide: 122, marker: 'auto-image-center-component-empty', substantive: false, declared: true },
-    { slide: 123, marker: 'auto-image-center-reveal-hidden', substantive: true, declared: true },
-    { slide: 124, marker: 'auto-image-center-visible', substantive: true, declared: true },
-  ]
+const centerProbeCases = [
+  { slide: 105, marker: 'auto-image-center', substantive: false, declared: false },
+  { slide: 119, marker: 'auto-image-center-whitespace', substantive: false, declared: true },
+  { slide: 120, marker: 'auto-image-center-comment', substantive: false, declared: true },
+  { slide: 121, marker: 'auto-image-center-sentinel', substantive: false, declared: true },
+  { slide: 122, marker: 'auto-image-center-component-empty', substantive: false, declared: true },
+  { slide: 123, marker: 'auto-image-center-reveal-hidden', substantive: true, declared: true },
+  { slide: 124, marker: 'auto-image-center-visible', substantive: true, declared: true },
+] as const
 
-  for (const fixture of cases) {
+for (const fixture of centerProbeCases) {
+  test(`classifies center probe: ${fixture.marker}`, async ({ page }) => {
     await openSlide(page, fixture.slide, fixture.marker)
     const layout = layoutFor(page, fixture.marker)
     const probe = layout.locator('.auto-image-layout__semantic-probe')
     await expect(probe).toHaveCount(fixture.declared ? 1 : 0)
     await expect(layout.locator('.autofit')).toHaveCount(0)
     if (!fixture.declared)
-      continue
+      return
 
     await expect(probe).toHaveAttribute('hidden', '')
     await expect(probe).toHaveAttribute('inert', '')
@@ -1264,8 +1264,8 @@ test('classifies every declared center probe branch without geometry or paint', 
     await expect(layout).toHaveClass(fixture.substantive
       ? /auto-image-layout--unsupported/
       : /auto-image-layout(?!--unsupported)/)
-  }
-})
+  })
+}
 
 test('reclassifies a declared center probe from empty to substantive and back', async ({ page }) => {
   await openSlide(page, 145, 'auto-image-center-live')
