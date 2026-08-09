@@ -1,7 +1,8 @@
 ---
 theme: ../..
 title: AutoFit browser fixture
-layout: default
+defaults:
+  layout: auto-default
 autofit:
   largeTiers: -1
   unexpected: ignored-without-auto
@@ -1898,7 +1899,7 @@ autofit:
 <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
 
 ---
-layout: default
+layout: auto-default
 autofit:
   largeTiers: 4
   smallTiers: 0
@@ -1992,7 +1993,7 @@ layout: auto-column
 <h6 data-testid="auto-column-footer-h6">Footer h6</h6>
 
 ---
-layout: default
+layout: auto-default
 ---
 
 # Default optical equivalent
@@ -2827,7 +2828,7 @@ image:
 <!-- empty before browser mutation -->
 
 ---
-layout: default
+layout: auto-default
 ---
 
 <div data-testid="direct-autofit-empty-regression">Direct AutoFit empty</div>
@@ -2895,7 +2896,7 @@ image:
 <h6 data-testid="auto-image-shell-equivalent-footer-h6">Fixed footer heading six</h6>
 
 ---
-layout: default
+layout: auto-default
 ---
 
 <h1 data-testid="default-shell-equivalent-main-h1">Fixed main heading one</h1>

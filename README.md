@@ -2,7 +2,7 @@
 
 [![NPM version](https://img.shields.io/npm/v/slidev-addon-autofit?color=7A0019&label=)](https://www.npmjs.com/package/slidev-addon-autofit)
 
-A [Slidev](https://github.com/slidevjs/slidev) addon with a WYSIWYM default layout: authors describe ordinary Markdown structure, and the optional AutoFit region selects the largest configured typography-and-spacing tier that fits its real browser geometry.
+A [Slidev](https://github.com/slidevjs/slidev) addon with a WYSIWYM `auto-default` layout: authors describe ordinary Markdown structure, and the optional AutoFit region selects the largest configured typography-and-spacing tier that fits its real browser geometry.
 
 ## Installation
 
@@ -18,6 +18,9 @@ Select it in the deck's headmatter:
 ---
 addons:
   - autofit
+layout: cover
+defaults:
+  layout: auto-default
 ---
 ```
 
@@ -32,9 +35,9 @@ pnpm dev
 
 `pnpm dev` serves and opens the comprehensive [`example.md`](./example.md) deck. The local deck retains `theme: default` and discovers this repository's addon files directly, so edits are reflected immediately.
 
-## Default layout and named slots
+## Auto-default layout and named slots
 
-The default layout supports fixed content above and below an optional AutoFit
+The `auto-default` layout supports fixed content above and below an optional AutoFit
 region:
 
 | Slot | Purpose |
@@ -101,7 +104,7 @@ The third image has this longer optional caption.
 ::auto::
 
 - AutoFit receives the remaining space to the left of the image group.
-- It uses the same `autofit` configuration as the default layout.
+- It uses the same `autofit` configuration as the `auto-default` layout.
 
 ::footer::
 
@@ -191,7 +194,7 @@ the layout manage image sizing, caption spacing, and AutoFit typography.
 ## Auto-column layout
 
 Use `layout: auto-column` for two equal AutoFit columns. The default slot and
-footer work as they do in the default layout.
+footer work as they do in the `auto-default` layout.
 
 ```markdown
 ---
@@ -348,6 +351,6 @@ geometry and are not guaranteed to remain layout-stable.
 
 ## Examples
 
-See [`example.md`](./example.md) for complete default-layout, auto-column, and
+See [`example.md`](./example.md) for complete auto-default, auto-column, and
 auto-image examples, including configuration, alignment, reveals, media,
 overflow, and unsupported-content demonstrations.

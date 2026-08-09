@@ -12,7 +12,7 @@ async function slide(page: Page, number: number, marker: string): Promise<Locato
   })
 }
 
-async function defaultSlide(page: Page, number: number, marker: string): Promise<Locator> {
+async function autoDefaultSlide(page: Page, number: number, marker: string): Promise<Locator> {
   await page.goto(`/${number}`)
   const visibleMarker = page.locator(`[data-testid="${marker}"]:visible`)
   await expect(visibleMarker).toBeVisible()
@@ -263,8 +263,8 @@ test('neutralizes AutoFit heading optical offsets while retaining fixed-region o
   await expect(layout).not.toHaveAttribute('data-layout-overflow', 'true')
 })
 
-test('matches the equivalent default layout geometry and constrains every column measurement box', async ({ page }) => {
-  const defaults = await defaultSlide(page, 96, 'default-equivalent-geometry')
+test('matches the equivalent auto-default layout geometry and constrains every column measurement box', async ({ page }) => {
+  const defaults = await autoDefaultSlide(page, 96, 'default-equivalent-geometry')
   const defaultEdges = await contentEdges(defaults)
   const defaultMain = await box(defaults.locator('.default-layout__main'))
   const defaultAuto = await box(defaults.locator('.autofit'))
@@ -465,8 +465,8 @@ test('clips fixed vertical and horizontal overflow while the layout diagnostic s
   }
 })
 
-test('keeps both managed heading types neutral while fixed main and footer offsets exactly match default', async ({ page }) => {
-  await defaultSlide(page, 101, 'default-optical-equivalent')
+test('keeps both managed heading types neutral while fixed main and footer offsets exactly match auto-default', async ({ page }) => {
+  await autoDefaultSlide(page, 101, 'default-optical-equivalent')
   const defaultOffsets: Record<string, string[]> = {}
   for (const region of ['main', 'footer'] as const) {
     for (const heading of ['h1', 'h6'] as const) {
