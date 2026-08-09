@@ -262,7 +262,7 @@ test('retains an exact-signature stable presentation for recovery after unsuppor
 
 test('lets the fixed-region diagnostic remain visibly dominant', async ({ page }) => {
   await page.goto('/41')
-  const layout = page.locator('.default-layout').filter({
+  const layout = page.locator('.auto-default-layout').filter({
     has: page.getByTestId('fixed-overflow-unsupported'),
   })
   const root = layout.locator('.autofit')
@@ -270,6 +270,6 @@ test('lets the fixed-region diagnostic remain visibly dominant', async ({ page }
   await expect(layout).toHaveAttribute('data-layout-overflow', 'true')
   await expectUnsupported(root, 'list-item-missing-leading-content')
   await expect(root.locator('.autofit__unsupported-badge')).toBeHidden()
-  await expect(layout.locator('.default-layout__overflow-badge')).toBeVisible()
+  await expect(layout.locator('.auto-default-layout__overflow-badge')).toBeVisible()
   await expect(root).toHaveCSS('box-shadow', 'none')
 })

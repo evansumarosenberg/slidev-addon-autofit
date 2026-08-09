@@ -16,7 +16,7 @@ async function autoDefaultSlide(page: Page, number: number, marker: string): Pro
   await page.goto(`/${number}`)
   const visibleMarker = page.locator(`[data-testid="${marker}"]:visible`)
   await expect(visibleMarker).toBeVisible()
-  return page.locator('.slidev-layout.default.default-layout').filter({
+  return page.locator('.slidev-layout.auto-default.auto-default-layout').filter({
     has: visibleMarker,
   })
 }
@@ -266,9 +266,9 @@ test('neutralizes AutoFit heading optical offsets while retaining fixed-region o
 test('matches the equivalent auto-default layout geometry and constrains every column measurement box', async ({ page }) => {
   const defaults = await autoDefaultSlide(page, 96, 'default-equivalent-geometry')
   const defaultEdges = await contentEdges(defaults)
-  const defaultMain = await box(defaults.locator('.default-layout__main'))
+  const defaultMain = await box(defaults.locator('.auto-default-layout__main'))
   const defaultAuto = await box(defaults.locator('.autofit'))
-  const defaultFooter = await box(defaults.locator('.default-layout__footer'))
+  const defaultFooter = await box(defaults.locator('.auto-default-layout__footer'))
   const columns = await slide(page, 85, 'auto-column-equivalent-geometry')
   const columnEdges = await contentEdges(columns)
   const columnMain = await box(columns.locator('.auto-column-layout__main'))

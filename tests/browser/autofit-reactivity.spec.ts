@@ -1733,7 +1733,7 @@ test('remeasures typography-changing and geometry-only reveal classes', async ({
 
 test('keeps accepted split-list reveal DOM as supported sibling lists without stitching', async ({ page }) => {
   await gotoSlide(page, 45, 'split-list-reveal-slide')
-  const autofit = page.locator('.slidev-layout.default > .autofit')
+  const autofit = page.locator('.slidev-layout.auto-default > .autofit')
   await waitForStable(autofit)
   await waitForLifecycleIdle(page)
 

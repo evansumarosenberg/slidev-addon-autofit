@@ -98,9 +98,9 @@ async function shellMetrics(layout: Locator, remainingSelector: string) {
         bottom: rootStyle.paddingBottom,
         left: rootStyle.paddingLeft,
       },
-      main: rect(required('.auto-image-layout__main, .default-layout__main')),
+      main: rect(required('.auto-image-layout__main, .auto-default-layout__main')),
       remaining: rect(required(selector)),
-      footer: rect(required('.auto-image-layout__footer, .default-layout__footer')),
+      footer: rect(required('.auto-image-layout__footer, .auto-default-layout__footer')),
       overflow: rootStyle.overflow,
       remainingOverflow: getComputedStyle(required(selector)).overflow,
       rows: rootStyle.gridTemplateRows,
@@ -1154,7 +1154,7 @@ test('matches the default shell bounds, fixed tracks, clipping, and heading offs
   const autoShell = await shellMetrics(autoLayout, '.auto-image-layout__stage')
 
   await openSlide(page, 150, 'default-shell-equivalent-main-h1')
-  const defaultLayout = page.locator('.slidev-layout.default').filter({
+  const defaultLayout = page.locator('.slidev-layout.auto-default').filter({
     has: page.getByTestId('default-shell-equivalent-main-h1'),
   })
   const defaultShell = await shellMetrics(defaultLayout, '.autofit')

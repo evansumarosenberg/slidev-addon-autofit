@@ -19,11 +19,11 @@ const { overflowing } = useLayoutOverflow({ layout, main, footer })
 <template>
   <div
     ref="layout"
-    class="slidev-layout default default-layout"
-    :class="{ 'default-layout--overflow': overflowing }"
+    class="slidev-layout auto-default auto-default-layout"
+    :class="{ 'auto-default-layout--overflow': overflowing }"
     :data-layout-overflow="overflowing ? 'true' : undefined"
   >
-    <div ref="main" class="default-layout__main">
+    <div ref="main" class="auto-default-layout__main">
       <slot />
     </div>
 
@@ -31,16 +31,16 @@ const { overflowing } = useLayoutOverflow({ layout, main, footer })
       <slot name="auto" />
     </LayoutAutoFitBridge>
 
-    <div v-if="hasFooter" ref="footer" class="default-layout__footer">
+    <div v-if="hasFooter" ref="footer" class="auto-default-layout__footer">
       <slot name="footer" />
     </div>
 
     <div
       v-if="overflowing"
-      class="default-layout__diagnostics"
+      class="auto-default-layout__diagnostics"
       aria-hidden="true"
     >
-      <span class="default-layout__overflow-badge">LAYOUT OVERFLOW</span>
+      <span class="auto-default-layout__overflow-badge">LAYOUT OVERFLOW</span>
     </div>
   </div>
 </template>

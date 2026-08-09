@@ -12,7 +12,7 @@
   --slidev-auto-image-caption-color: color-mix(in srgb, currentColor 70%, transparent);
 }
 
-.slidev-layout.default.default-layout,
+.slidev-layout.auto-default.auto-default-layout,
 .slidev-layout.auto-column.auto-column-layout {
   position: relative;
   display: grid;
@@ -28,8 +28,8 @@
  * Keep the base theme's optical fixed-heading offsets without moving their
  * layout rectangles outside the padded box.
  */
-.slidev-layout.default
-  > :where(.default-layout__main, .default-layout__footer)
+.slidev-layout.auto-default
+  > :where(.auto-default-layout__main, .auto-default-layout__footer)
   :is(h1, h6),
 .slidev-layout.auto-column
   > :where(.auto-column-layout__main, .auto-column-layout__footer)
@@ -50,21 +50,21 @@
   text-indent: 0;
 }
 
-.default-layout__main {
+.auto-default-layout__main {
   grid-row: 1;
   min-width: 0;
 }
 
-.default-layout > .autofit {
+.auto-default-layout > .autofit {
   grid-row: 2;
 }
 
-.default-layout__footer {
+.auto-default-layout__footer {
   grid-row: 3;
   min-width: 0;
 }
 
-.default-layout__footer > :last-child {
+.auto-default-layout__footer > :last-child {
   margin-block-end: 0rem;
 }
 
@@ -339,7 +339,7 @@
 }
 
 .autofit__diagnostics,
-.default-layout__diagnostics,
+.auto-default-layout__diagnostics,
 .auto-column-layout__diagnostics {
   position: absolute;
   inset: 0;
@@ -347,7 +347,7 @@
   pointer-events: none;
 }
 
-.default-layout--overflow,
+.auto-default-layout--overflow,
 .auto-column-layout--overflow {
   box-shadow: inset 0 0 0 2px var(--slidev-autofit-diagnostic-color);
 }
@@ -359,7 +359,7 @@
 
 .autofit__overflow-badge,
 .autofit__unsupported-badge,
-.default-layout__overflow-badge,
+.auto-default-layout__overflow-badge,
 .auto-column-layout__overflow-badge {
   position: absolute;
   inset-block-start: 0.35rem;
@@ -374,7 +374,7 @@
   letter-spacing: 0.04em;
 }
 
-.default-layout--overflow :is(.autofit--overflow, .autofit--unsupported) {
+.auto-default-layout--overflow :is(.autofit--overflow, .autofit--unsupported) {
   box-shadow: none;
 }
 
@@ -382,7 +382,7 @@
   box-shadow: none;
 }
 
-.default-layout--overflow
+.auto-default-layout--overflow
   :is(.autofit__overflow-badge, .autofit__unsupported-badge) {
   display: none;
 }

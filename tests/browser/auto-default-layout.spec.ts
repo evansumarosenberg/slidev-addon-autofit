@@ -9,7 +9,7 @@ async function gotoSlide(page: Page, slide: number, marker: string) {
 }
 
 function activeLayout(page: Page, marker: string) {
-  return page.locator('.slidev-layout.default').filter({
+  return page.locator('.slidev-layout.auto-default').filter({
     has: page.getByTestId(marker),
   })
 }
@@ -62,7 +62,7 @@ test('preserves main-only placement and ignores inert autofit frontmatter', asyn
   await gotoSlide(page, 1, 'main-only')
   const layout = activeLayout(page, 'main-only')
   const edges = await contentEdges(layout)
-  const main = await requiredBox(layout.locator('.default-layout__main'))
+  const main = await requiredBox(layout.locator('.auto-default-layout__main'))
   const heading = await requiredBox(layout.locator('h1'))
 
   expectSameEdge(main.y, edges.top)
@@ -130,9 +130,9 @@ test('places named auto/footer regions by track, independent of source order', a
     await gotoSlide(page, fixture.slide, fixture.marker)
     const layout = activeLayout(page, fixture.marker)
     const edges = await contentEdges(layout)
-    const main = await requiredBox(layout.locator('.default-layout__main'))
+    const main = await requiredBox(layout.locator('.auto-default-layout__main'))
     const auto = await requiredBox(layout.locator('.autofit'))
-    const footer = await requiredBox(layout.locator('.default-layout__footer'))
+    const footer = await requiredBox(layout.locator('.auto-default-layout__footer'))
 
     expectSameEdge(main.y, edges.top)
     expectSameEdge(main.y + main.height, auto.y)
@@ -145,12 +145,12 @@ test('additional main content reduces only the auto allocation', async ({ page }
   await gotoSlide(page, 2, 'auto-footer-order')
   const baselineLayout = activeLayout(page, 'auto-footer-order')
   const baselineAuto = await requiredBox(baselineLayout.locator('.autofit'))
-  const baselineFooter = await requiredBox(baselineLayout.locator('.default-layout__footer'))
+  const baselineFooter = await requiredBox(baselineLayout.locator('.auto-default-layout__footer'))
 
   await gotoSlide(page, 4, 'additional-main')
   const expandedLayout = activeLayout(page, 'additional-main')
   const expandedAuto = await requiredBox(expandedLayout.locator('.autofit'))
-  const expandedFooter = await requiredBox(expandedLayout.locator('.default-layout__footer'))
+  const expandedFooter = await requiredBox(expandedLayout.locator('.auto-default-layout__footer'))
   const expandedEdges = await contentEdges(expandedLayout)
 
   expect(expandedAuto.height).toBeLessThan(baselineAuto.height - 80)
@@ -162,8 +162,8 @@ test('bottom-anchors a footer-only slide without synthetic region gaps', async (
   await gotoSlide(page, 5, 'footer-only')
   const layout = activeLayout(page, 'footer-only')
   const edges = await contentEdges(layout)
-  const main = await requiredBox(layout.locator('.default-layout__main'))
-  const footer = await requiredBox(layout.locator('.default-layout__footer'))
+  const main = await requiredBox(layout.locator('.auto-default-layout__main'))
+  const footer = await requiredBox(layout.locator('.auto-default-layout__footer'))
 
   expect(main.height).toBeLessThanOrEqual(EDGE_TOLERANCE)
   expectSameEdge(footer.y + footer.height, edges.bottom)
@@ -174,7 +174,7 @@ test('extends auto without a footer to the padded bottom after a natural main tr
   await gotoSlide(page, 16, 'auto-only-slide')
   const layout = activeLayout(page, 'auto-only-slide')
   const edges = await contentEdges(layout)
-  const mainLocator = layout.locator('.default-layout__main')
+  const mainLocator = layout.locator('.auto-default-layout__main')
   const main = await requiredBox(mainLocator)
   const auto = await requiredBox(layout.locator('.autofit'))
   const mainSizing = await mainLocator.evaluate((element) => {
@@ -192,7 +192,7 @@ test('extends auto without a footer to the padded bottom after a natural main tr
   expectSameEdge(main.y, edges.top)
   expectSameEdge(main.y + main.height, auto.y)
   expectSameEdge(auto.y + auto.height, edges.bottom)
-  await expect(layout.locator('.default-layout__footer')).toHaveCount(0)
+  await expect(layout.locator('.auto-default-layout__footer')).toHaveCount(0)
 })
 
 test('commits deterministic neutral state for a semantically empty auto slot', async ({ page }) => {
@@ -305,10 +305,10 @@ test('detects fixed vertical and horizontal overflow with layout diagnostics', a
     await gotoSlide(page, fixture.slide, fixture.marker)
     const layout = activeLayout(page, fixture.marker)
 
-    await expect(layout).toHaveClass(/default-layout--overflow/)
+    await expect(layout).toHaveClass(/auto-default-layout--overflow/)
     await expect(layout).toHaveAttribute('data-layout-overflow', 'true')
-    await expect(layout.locator('.default-layout__overflow-badge')).toHaveText('LAYOUT OVERFLOW')
-    await expect(layout.locator('.default-layout__diagnostics')).toHaveCSS('pointer-events', 'none')
+    await expect(layout.locator('.auto-default-layout__overflow-badge')).toHaveText('LAYOUT OVERFLOW')
+    await expect(layout.locator('.auto-default-layout__diagnostics')).toHaveCSS('pointer-events', 'none')
     await expect(layout).toHaveCSS('overflow', 'hidden')
 
     if (fixture.marker === 'vertical-layout-overflow') {
@@ -335,7 +335,7 @@ test('reports each layout-overflow entry without duplicate observations', async 
     (element as HTMLElement).style.height = '800px'
   })
   await expect(layout).toHaveAttribute('data-layout-overflow', 'true')
-  await expect(layout.locator('.default-layout__overflow-badge')).toHaveText('LAYOUT OVERFLOW')
+  await expect(layout.locator('.auto-default-layout__overflow-badge')).toHaveText('LAYOUT OVERFLOW')
   await expect.poll(() => warnings.length).toBe(1)
   expect(warnings[0]).toBe(layoutOverflowWarning)
 
@@ -350,7 +350,7 @@ test('reports each layout-overflow entry without duplicate observations', async 
     (element as HTMLElement).style.height = '1px'
   })
   await expect(layout).not.toHaveAttribute('data-layout-overflow', 'true')
-  await expect(layout.locator('.default-layout__overflow-badge')).toHaveCount(0)
+  await expect(layout.locator('.auto-default-layout__overflow-badge')).toHaveCount(0)
 
   await probe.evaluate((element) => {
     (element as HTMLElement).style.height = '800px'
@@ -374,7 +374,7 @@ test('detects leading-side and top descendant overflow transitions at 0.5px tole
 
   const offsets = await probe.evaluate((element) => {
     const probeElement = element as HTMLElement
-    const layoutElement = probeElement.closest('.default-layout') as HTMLElement
+    const layoutElement = probeElement.closest('.auto-default-layout') as HTMLElement
     const layoutRect = layoutElement.getBoundingClientRect()
     const probeRect = probeElement.getBoundingClientRect()
     const style = getComputedStyle(layoutElement)

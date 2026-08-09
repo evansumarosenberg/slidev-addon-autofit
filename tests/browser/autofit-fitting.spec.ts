@@ -90,7 +90,7 @@ test('honors custom tiers and completes zero-side searches', async ({ page }) =>
 
 test('reports vertical, unbreakable code/table, and fixed-media overflow on both axes', async ({ page }) => {
   await gotoSlide(page, 23, 'dense-overflow')
-  const layout = page.locator('.default-layout').filter({
+  const layout = page.locator('.auto-default-layout').filter({
     has: page.getByTestId('dense-overflow'),
   })
 
@@ -289,7 +289,7 @@ test('enters, leaves, and re-enters AutoFit overflow without duplicate warnings'
 
 test('measures a genuine zero-height auto allocation and gives layout overflow visible precedence', async ({ page }) => {
   await gotoSlide(page, 14, 'vertical-layout-overflow')
-  const layout = page.locator('.default-layout').filter({
+  const layout = page.locator('.auto-default-layout').filter({
     has: page.getByTestId('vertical-layout-overflow'),
   })
   const autofit = layout.locator('.autofit')
@@ -300,7 +300,7 @@ test('measures a genuine zero-height auto allocation and gives layout overflow v
   await expect(autofit).toHaveAttribute('data-autofit-tier', '-4')
   await expect(autofit).toHaveAttribute('data-autofit-effective-alignment', 'top')
   await expect(autofit.locator('.autofit__overflow-badge')).toBeHidden()
-  await expect(layout.locator('.default-layout__overflow-badge')).toBeVisible()
+  await expect(layout.locator('.auto-default-layout__overflow-badge')).toBeVisible()
 
   const [autofitBoxShadow, layoutBoxShadow] = await Promise.all([
     autofit.evaluate(element => getComputedStyle(element).boxShadow),
