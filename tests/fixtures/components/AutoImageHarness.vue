@@ -113,7 +113,7 @@ const transitionHeight = ref(140)
 
     <AutoImage
       data-testid="auto-image-multiple-reactive"
-      style="width: 260px; height: 180px"
+      style="width: 268px; height: 180px"
     >
       <img data-testid="auto-image-reactive-first" :src="landscapeSource" alt="Reactive first">
       <p data-testid="auto-image-reactive-first-caption">Reactive first caption.</p>

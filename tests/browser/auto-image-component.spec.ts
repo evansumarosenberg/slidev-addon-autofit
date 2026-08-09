@@ -846,8 +846,8 @@ test('publishes and recovers every multi-item geometry overflow reason', async (
     ['16px', '200px', 'none', 'item-gap-overflow'],
     ['200px', '200px', 'nowrap', 'caption-inline-overflow'],
     ['200px', '50px', 'long', 'caption-block-overflow'],
-    ['200px', '16px', 'empty-first', 'no-image-block-space'],
-    ['17px', '200px', 'none', 'no-renderable-image-size'],
+    ['200px', '8px', 'empty-first', 'no-image-block-space'],
+    ['21px', '200px', 'none', 'no-renderable-image-size'],
   ] as const) {
     await test.step(reason, async () => {
       const before = await measureCount(root)
@@ -1215,7 +1215,7 @@ test('publishes exact default custom properties and derives caption color in lig
   })
   expect(properties).toMatchObject({
     regionGap: '1rem',
-    captionGap: '1rem',
+    captionGap: '0.5rem',
     captionFontSize: '0.875rem',
     captionLineHeight: '1.25rem',
   })
@@ -1277,7 +1277,7 @@ test('publishes every overflow reason with exact group geometry and precedence',
   expect(inlineGeometry.image.height).toBeGreaterThan(0)
   const inlineGap = inlineGeometry.caption!.top
     - (inlineGeometry.image.top + inlineGeometry.image.height)
-  expect(inlineGap).toBeCloseTo(16 * inlineScale, 1)
+  expect(inlineGap).toBeCloseTo(8 * inlineScale, 1)
   const inlineGroupHeight = inlineGeometry.image.height
     + inlineGap
     + inlineGeometry.caption!.height
@@ -1297,7 +1297,7 @@ test('publishes every overflow reason with exact group geometry and precedence',
   expect(inlineNoSpaceGeometry.caption).not.toBeNull()
   expect(inlineNoSpaceGeometry.caption!.width).toBeCloseTo(inlineNoSpaceScale, 1)
   expect(inlineNoSpaceGeometry.caption!.top - inlineNoSpaceGeometry.image.top)
-    .toBeCloseTo(16 * inlineNoSpaceScale, 1)
+    .toBeCloseTo(8 * inlineNoSpaceScale, 1)
   expect(inlineNoSpaceGeometry.image.top - inlineNoSpaceGeometry.viewport.top)
     .toBeCloseTo(0, 1)
 
@@ -1313,7 +1313,7 @@ test('publishes every overflow reason with exact group geometry and precedence',
   expect(zeroInlinePrecedenceGeometry.caption).not.toBeNull()
   expect(zeroInlinePrecedenceGeometry.caption!.width).toBeCloseTo(0, 1)
   expect(zeroInlinePrecedenceGeometry.caption!.top - zeroInlinePrecedenceGeometry.image.top)
-    .toBeCloseTo(16 * zeroInlinePrecedenceScale, 1)
+    .toBeCloseTo(8 * zeroInlinePrecedenceScale, 1)
 
   const captionBlock = page.getByTestId('auto-image-caption-block')
   await waitForState(captionBlock, 'overflow')
@@ -1323,9 +1323,9 @@ test('publishes every overflow reason with exact group geometry and precedence',
   expect(captionBlockGeometry.caption).not.toBeNull()
   expect(captionBlockGeometry.caption!.height).toBeGreaterThan(100)
   expect(captionBlockGeometry.caption!.top - captionBlockGeometry.viewport.top)
-    .toBeCloseTo(16 * captionBlockScale, 1)
+    .toBeCloseTo(8 * captionBlockScale, 1)
   expect(captionBlockGeometry.caption!.top - captionBlockGeometry.image.top)
-    .toBeCloseTo(16 * captionBlockScale, 1)
+    .toBeCloseTo(8 * captionBlockScale, 1)
 
   const noImageBlock = page.getByTestId('auto-image-no-image-block')
   await waitForState(noImageBlock, 'overflow')
@@ -1334,7 +1334,7 @@ test('publishes every overflow reason with exact group geometry and precedence',
   expect(noImageBlockGeometry.image).toMatchObject({ width: 0, height: 0 })
   expect(noImageBlockGeometry.caption).not.toBeNull()
   expect(noImageBlockGeometry.caption!.top - noImageBlockGeometry.image.top)
-    .toBeCloseTo(16 * noImageBlockScale, 1)
+    .toBeCloseTo(8 * noImageBlockScale, 1)
   expect(noImageBlockGeometry.image.top - noImageBlockGeometry.viewport.top)
     .toBeCloseTo(0, 1)
 
