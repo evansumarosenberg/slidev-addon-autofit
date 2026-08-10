@@ -459,6 +459,30 @@ This second default-slot paragraph consumes more natural height, leaving a visib
 **Fixed footer:** both fixed regions reduce only the middle auto track.
 
 ---
+
+# Links in footer
+
+::auto::
+
+Links in footer should not cause overflow.
+
+::footer::
+
+[Google](https://www.google.com/)
+
+---
+
+# Headers in footer
+
+::auto::
+
+Headers in footer should not cause overflow.
+
+::footer::
+
+## Footer text
+
+---
 layout: auto-image
 ---
 

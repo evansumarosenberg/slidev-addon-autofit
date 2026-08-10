@@ -34,9 +34,79 @@ const CLIPPING_OVERFLOW_VALUES = new Set([
   'scroll',
 ])
 
+const REPLACED_OR_MEDIA_ELEMENTS = new Set([
+  'AUDIO',
+  'CANVAS',
+  'EMBED',
+  'IFRAME',
+  'IMG',
+  'INPUT',
+  'OBJECT',
+  'SELECT',
+  'SVG',
+  'TEXTAREA',
+  'VIDEO',
+])
+
 function pixelValue(value: string): number {
   const parsed = Number.parseFloat(value)
   return Number.isFinite(parsed) ? parsed : 0
+}
+
+function hasOnlyNumericValues(value: string, expected: number): boolean {
+  const values = value.match(/[+-]?(?:\d*\.)?\d+(?:e[+-]?\d+)?/gi)
+  return values !== null
+    && values.length > 0
+    && values.every(value => Number.parseFloat(value) === expected)
+}
+
+function isIdentityRotation(value: string): boolean {
+  if (value === 'none')
+    return true
+
+  const angle = value.trim().match(/(?:^|\s)([+-]?(?:\d*\.)?\d+(?:e[+-]?\d+)?)(deg|turn)$/i)
+  if (!angle)
+    return false
+
+  const degrees = Number.parseFloat(angle[1]) * (angle[2].toLowerCase() === 'turn' ? 360 : 1)
+  return Number.isFinite(degrees) && Number.isInteger(degrees / 360)
+}
+
+function hasEffectiveTransform(style: CSSStyleDeclaration): boolean {
+  const transform = style.transform
+  const transformIsIdentity = transform === 'none'
+    || (transform.startsWith('matrix(')
+      && transform === 'matrix(1, 0, 0, 1, 0, 0)')
+    || (transform.startsWith('matrix3d(')
+      && transform === 'matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)')
+
+  return !transformIsIdentity
+    || (style.translate !== 'none' && !hasOnlyNumericValues(style.translate, 0))
+    || !isIdentityRotation(style.rotate)
+    || (style.scale !== 'none' && !hasOnlyNumericValues(style.scale, 1))
+}
+
+function hasNegativeMargin(style: CSSStyleDeclaration): boolean {
+  return [
+    style.marginTop,
+    style.marginRight,
+    style.marginBottom,
+    style.marginLeft,
+  ].some((margin) => {
+    const value = Number.parseFloat(margin)
+    return !Number.isFinite(value) || value < 0
+  })
+}
+
+function isGeometryTransparentInline(descendant: Element): boolean {
+  if (REPLACED_OR_MEDIA_ELEMENTS.has(descendant.tagName))
+    return false
+
+  const style = getComputedStyle(descendant)
+  return style.display === 'inline'
+    && style.position === 'static'
+    && !hasEffectiveTransform(style)
+    && !hasNegativeMargin(style)
 }
 
 function readLayoutCoordinateSpace(layout: HTMLElement): LayoutCoordinateSpace | null {
@@ -114,13 +184,13 @@ function readRenderedRegionBounds(
   const regionBounds = toLocalBounds(region.getBoundingClientRect(), coordinates)
   const bounds = {
     top: regionBounds.top,
-    right: Math.max(regionBounds.right, regionBounds.left + region.scrollWidth),
-    bottom: Math.max(regionBounds.bottom, regionBounds.top + region.scrollHeight),
+    right: regionBounds.right,
+    bottom: regionBounds.bottom,
     left: regionBounds.left,
   }
 
   for (const descendant of region.querySelectorAll('*')) {
-    if (descendant.getClientRects().length === 0)
+    if (descendant.getClientRects().length === 0 || isGeometryTransparentInline(descendant))
       continue
 
     const descendantBounds = readClippedDescendantBounds(

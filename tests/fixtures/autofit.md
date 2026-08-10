@@ -3058,3 +3058,151 @@ transition: none
 ---
 
 <AutoImageLayoutRawConfigHarness />
+
+---
+layout: auto-default
+---
+
+# Structural footer link: auto-default
+
+::footer::
+
+<style>
+.auto-default-layout__footer a {
+  border-bottom: 12px solid transparent;
+  line-height: 1px;
+}
+</style>
+
+<div data-testid="fixed-footer-link-auto-default" style="height: 1px"></div>
+
+[Fitting footer link](https://example.test/)
+
+---
+layout: auto-default
+---
+
+# Structural footer heading: auto-default
+
+::footer::
+
+<h1 data-testid="fixed-footer-heading-auto-default" style="margin: 0; line-height: 1px">Fitting footer heading</h1>
+
+---
+layout: auto-column
+---
+
+# Structural footer link: auto-column
+
+::left::
+
+Left column
+
+::right::
+
+Right column
+
+::footer::
+
+<style>
+.auto-column-layout__footer a {
+  border-bottom: 12px solid transparent;
+  line-height: 1px;
+}
+</style>
+
+<div data-testid="fixed-footer-link-auto-column" style="height: 1px"></div>
+
+[Fitting footer link](https://example.test/)
+
+---
+layout: auto-column
+---
+
+# Structural footer heading: auto-column
+
+::left::
+
+Left column
+
+::right::
+
+Right column
+
+::footer::
+
+<h1 data-testid="fixed-footer-heading-auto-column" style="margin: 0; line-height: 1px">Fitting footer heading</h1>
+
+---
+layout: auto-image
+image:
+  position: left
+  size: 30%
+---
+
+# Structural footer link: auto-image
+
+::image::
+
+![Structural footer link image](../../public/images/autofit_placeholder.jpg)
+
+::auto::
+
+Auto content
+
+::footer::
+
+<style>
+.auto-image-layout__footer a {
+  border-bottom: 12px solid transparent;
+  line-height: 1px;
+}
+</style>
+
+<div data-testid="fixed-footer-link-auto-image" style="height: 1px"></div>
+
+[Fitting footer link](https://example.test/)
+
+---
+layout: auto-image
+image:
+  position: left
+  size: 30%
+---
+
+# Structural footer heading: auto-image
+
+::image::
+
+![Structural footer heading image](../../public/images/autofit_placeholder.jpg)
+
+::auto::
+
+Auto content
+
+::footer::
+
+<h1 data-testid="fixed-footer-heading-auto-image" style="margin: 0; line-height: 1px">Fitting footer heading</h1>
+
+---
+layout: auto-default
+---
+
+# Structural descendant classification boundaries
+
+::footer::
+
+<style>
+[data-testid="structural-boundaries-footer"] [data-testid^="structural-boundary-"] {
+  display: none;
+}
+</style>
+
+<div data-testid="structural-boundaries-footer" style="height: 1px">
+  <span data-testid="structural-boundary-atomic">Atomic inline boundary</span>
+  <img data-testid="structural-boundary-media" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==">
+  <span data-testid="structural-boundary-positioned">Positioned boundary</span>
+  <span data-testid="structural-boundary-transformed">Transformed boundary</span>
+  <span data-testid="structural-boundary-negative-margin">Negative margin boundary</span>
+  <span data-testid="structural-boundary-clipped"><span data-testid="structural-boundary-clipped-child">Clipped boundary</span></span>
+</div>
