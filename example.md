@@ -748,8 +748,8 @@ image:
 
 # Auto-image group: top row with adjacent images
 
-This fixed introduction stays above a three-image group while the AutoFit list
-uses the remaining region below it.
+This fixed introduction stays above an image group while the AutoFit list
+uses the remaining region below.
 
 ::image::
 
