@@ -120,6 +120,10 @@
   overflow: hidden;
 }
 
+.auto-image-layout--top > .auto-image-layout__stage {
+  margin-block-start: 0.5rem;
+}
+
 .auto-image-layout__image-track,
 .auto-image-layout__auto-track {
   min-width: 0;

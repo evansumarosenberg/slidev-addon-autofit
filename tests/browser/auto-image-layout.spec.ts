@@ -454,23 +454,27 @@ test('uses the fixed default shell and places named slots independently of sourc
 test('uses block allocation for top and bottom positions', async ({ page }) => {
   await openSlide(page, 107, 'auto-image-top')
   const top = layoutFor(page, 'auto-image-top')
+  const topMain = await box(top.locator('.auto-image-layout__main'))
   const topStage = await box(top.locator('.auto-image-layout__stage'))
   const topImage = await box(top.locator('.auto-image-layout__image-track'))
   const topAuto = await box(top.locator(':scope > .auto-image-layout__stage > .autofit'))
   const topScale = await top.locator('.auto-image-layout__stage').evaluate((element) => (
     element.getBoundingClientRect().height / (element as HTMLElement).clientHeight
   ))
+  closeTo(topStage.y - (topMain.y + topMain.height), 8 * topScale)
   closeTo(topImage.height / topStage.height * 100, 40)
   closeTo(topAuto.y - (topImage.y + topImage.height), 16 * topScale)
 
   await openSlide(page, 108, 'auto-image-bottom')
   const bottom = layoutFor(page, 'auto-image-bottom')
+  const bottomMain = await box(bottom.locator('.auto-image-layout__main'))
   const bottomStage = await box(bottom.locator('.auto-image-layout__stage'))
   const bottomImage = await box(bottom.locator('.auto-image-layout__image-track'))
   const bottomAuto = await box(bottom.locator(':scope > .auto-image-layout__stage > .autofit'))
   const bottomScale = await bottom.locator('.auto-image-layout__stage').evaluate((element) => (
     element.getBoundingClientRect().height / (element as HTMLElement).clientHeight
   ))
+  closeTo(bottomStage.y, bottomMain.y + bottomMain.height)
   closeTo(bottomImage.height / bottomStage.height * 100, 40)
   closeTo(bottomImage.y - (bottomAuto.y + bottomAuto.height), 16 * bottomScale)
 })

@@ -344,6 +344,7 @@ onBeforeUnmount(() => {
     class="slidev-layout auto-image auto-image-layout"
     :class="{
       'auto-image-layout--config-error': !normalized.valid,
+      'auto-image-layout--top': normalized.valid && normalized.config.position === 'top',
       'auto-image-layout--split-overflow': splitOverflow,
       'auto-image-layout--unsupported': centerUnsupported,
       'auto-image-layout--overflow': fixedOverflow,
