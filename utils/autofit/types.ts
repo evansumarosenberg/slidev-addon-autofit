@@ -1,3 +1,5 @@
+import type { AutofitDisplayMathBlock } from './display-math'
+
 export type AutofitRequestedAlignment =
   | 'top'
   | 'middle'
@@ -328,6 +330,8 @@ export interface AutofitVisualClassification {
 }
 
 export interface AutofitClassification {
+  /** Present only for managed-layout display math. */
+  readonly displayMathBlocks?: readonly AutofitDisplayMathBlock[]
   readonly units: readonly AutofitSemanticUnit[]
   readonly boundaries: readonly AutofitSemanticBoundary[]
   readonly marginResetElements: readonly Element[]
@@ -351,6 +355,7 @@ export interface AutofitTypographyBaselineEntry {
 }
 
 export interface AutofitTypographyAdapterOptions {
+  readonly displayMathBlocks?: readonly AutofitDisplayMathBlock[]
   readComputedStyle(element: Element): AutofitComputedTypographyStyle
 }
 

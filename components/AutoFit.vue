@@ -8,7 +8,7 @@ import {
   ref,
   watch,
 } from 'vue'
-import { classifyAutofitContent } from '../utils/autofit/classify'
+import { classifyAutofitContent as classifyContent } from '../utils/autofit/classify'
 import {
   isAutofitClassificationSemanticallyEmpty,
 } from '../utils/autofit/semantic-content'
@@ -118,6 +118,12 @@ let unsupportedWarningReason: AutofitUnsupportedReason | null = null
 let disposeTestSupersede: (() => void) | null = null
 let disposeAutoColumnParticipant: (() => void) | null = null
 let autoColumnRole: AutoColumnRole | null = null
+
+function classifyAutofitContent(element: Element) {
+  return classifyContent(element, {
+    displayMath: layoutConfiguration !== null || autoColumnRole !== null,
+  })
+}
 type AutoColumnSessionStamp = Readonly<{
   epoch: number
   generation: number

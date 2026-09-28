@@ -292,6 +292,13 @@ If there is too little space to distribute safely, `distributed` falls back to
 
 ## Media and supported content
 
+In `auto-default`, `auto-image`, and `auto-column`, standalone `$$ ... $$`
+LaTeX blocks participate in tier sizing and external spacing while retaining
+KaTeX's equation formatting and horizontal centering. Use separate blocks for
+separate spacing units; multiline equations remain one block. Equations too
+wide for the smallest tier report overflow. Inline `$ ... $` math retains its
+existing behavior in paragraphs and lists.
+
 Ordinary Markdown headings, paragraphs, lists, blockquotes, fenced code,
 tables, images, and media are supported. Text participates in tier sizing.
 Images, video, diagrams, embedded players, and other graphical media keep their

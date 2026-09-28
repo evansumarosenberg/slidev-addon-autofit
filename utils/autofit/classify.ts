@@ -1,4 +1,5 @@
 import { AUTOFIT_UNSUPPORTED_REASON_PRECEDENCE } from './types'
+import { readAutofitDisplayMathBlock } from './display-math'
 import type {
   AutofitClassification,
   AutofitGapKind,
@@ -498,6 +499,41 @@ class ClassificationBuilder {
   }
 }
 
-export function classifyAutofitContent(flowRoot: Element): AutofitClassification {
-  return new ClassificationBuilder().classify(flowRoot)
+export function classifyAutofitContent(
+  flowRoot: Element,
+  options: { readonly displayMath?: boolean } = {},
+): AutofitClassification {
+  const classification = new ClassificationBuilder().classify(flowRoot)
+  if (!options.displayMath)
+    return classification
+  const blocks = classification.units
+    .filter(unit => unit.kind === 'atomic')
+    .flatMap(unit => {
+      const block = readAutofitDisplayMathBlock(unit.root)
+      return block ? [block] : []
+    })
+  if (blocks.length === 0)
+    return classification
+  // Keep the existing semantic unit/carrier and boundary objects. Only its
+  // visual edge and the known external math margins need special ownership.
+  const visualRoots = new Map(blocks.map(block => [block.root, block.visual]))
+  const units = classification.visual.units.map(ownership => {
+    const visual = visualRoots.get(ownership.unit.root)
+    return visual
+      ? { ...ownership, fragments: [{ kind: 'atomic-root' as const, node: visual }] }
+      : ownership
+  })
+  return {
+    ...classification,
+    displayMathBlocks: blocks,
+    marginResetElements: [...classification.marginResetElements,
+      ...blocks.flatMap(block => [block.paragraph, block.display])],
+    visual: {
+      ...classification.visual,
+      units,
+      boundaries: classification.visual.boundaries.map((boundary, index) => ({
+        ...boundary, preceding: units[index], following: units[index + 1],
+      })),
+    },
+  }
 }

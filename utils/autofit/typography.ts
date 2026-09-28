@@ -115,8 +115,16 @@ function hasPreformattedAncestor(element: Element, flow: Element): boolean {
   return false
 }
 
-function collectTextBearingElements(flow: Element): Element[] {
+function collectTextBearingElements(
+  flow: Element,
+  blocks: AutofitTypographyAdapterOptions['displayMathBlocks'],
+): Element[] {
   return [...flow.querySelectorAll('*')].filter((element) => {
+    const math = blocks?.find(block => block.root === element || block.root.contains(element))
+    // Scale the paragraph supplying KaTeX's em base. Its internal font sizes,
+    // struts and line heights must continue to be controlled by KaTeX itself.
+    if (math)
+      return element === math.paragraph
     if (isMedia(element))
       return false
 
@@ -155,6 +163,7 @@ function formatPixelValue(value: number): string {
 class DomAutofitTypographyAdapter implements AutofitTypographyAdapter {
   readonly #flow: Element
   readonly #readComputedStyle: AutofitTypographyAdapterOptions['readComputedStyle']
+  readonly #displayMathBlocks: AutofitTypographyAdapterOptions['displayMathBlocks']
   readonly #styles = new AutofitGeneratedStyleOwner()
   #baseline: readonly AutofitTypographyBaselineEntry[] | null = null
   #neutralCapturePrepared = false
@@ -162,6 +171,7 @@ class DomAutofitTypographyAdapter implements AutofitTypographyAdapter {
   constructor(flow: Element, options: AutofitTypographyAdapterOptions) {
     this.#flow = flow
     this.#readComputedStyle = options.readComputedStyle
+    this.#displayMathBlocks = options.displayMathBlocks
   }
 
   prepareNeutralCapture(): void {
@@ -182,7 +192,7 @@ class DomAutofitTypographyAdapter implements AutofitTypographyAdapter {
     }
     this.#neutralCapturePrepared = false
 
-    return Object.freeze(collectTextBearingElements(this.#flow).map((element) => {
+    return Object.freeze(collectTextBearingElements(this.#flow, this.#displayMathBlocks).map((element) => {
       const computed = this.#readComputedStyle(element)
       return Object.freeze({
         element,
@@ -232,6 +242,7 @@ export function createAutofitTypographyAdapter(
   options: Partial<AutofitTypographyAdapterOptions> = {},
 ): AutofitTypographyAdapter {
   return new DomAutofitTypographyAdapter(flow, {
+    displayMathBlocks: options.displayMathBlocks,
     readComputedStyle: options.readComputedStyle ?? defaultReadComputedStyle,
   })
 }

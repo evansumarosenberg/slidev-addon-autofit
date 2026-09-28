@@ -121,6 +121,7 @@ interface AutofitTestHooks {
 }
 
 export interface AutofitClassificationSignature {
+  readonly displayMathElements?: readonly Element[]
   readonly units: readonly {
     readonly kind: string
     readonly root: Element
@@ -708,6 +709,10 @@ export function createAutofitClassificationSignature(
   classification: AutofitClassification,
 ): AutofitClassificationSignature {
   return {
+    ...(classification.displayMathBlocks ? {
+      displayMathElements: classification.displayMathBlocks.flatMap(block =>
+        [block.root, block.paragraph, block.display, block.katex, block.visual]),
+    } : {}),
     units: classification.units.map(unit => ({
       kind: unit.kind,
       root: unit.root,
@@ -724,7 +729,8 @@ export function isAutofitPresentationCompatible(
   presentation: AutofitStaticPresentation,
 ): boolean {
   if (
-    signature.units.length !== presentation.signature.units.length
+    !sameDisplayMathElements(signature, presentation.signature)
+    || signature.units.length !== presentation.signature.units.length
     || signature.boundaries.length !== presentation.signature.boundaries.length
   ) {
     return false
@@ -747,7 +753,8 @@ export function areAutofitClassificationSignaturesEqual(
   left: AutofitClassificationSignature,
   right: AutofitClassificationSignature,
 ): boolean {
-  return left.units.length === right.units.length
+  return sameDisplayMathElements(left, right)
+    && left.units.length === right.units.length
     && left.boundaries.length === right.boundaries.length
     && left.units.every((unit, index) => {
       const candidate = right.units[index]
@@ -763,6 +770,16 @@ export function areAutofitClassificationSignaturesEqual(
         && boundary.carrier.isConnected
         && candidate.carrier.isConnected
     })
+}
+
+function sameDisplayMathElements(
+  left: AutofitClassificationSignature,
+  right: AutofitClassificationSignature,
+): boolean {
+  const elements = left.displayMathElements ?? []
+  const other = right.displayMathElements ?? []
+  return elements.length === other.length
+    && elements.every((element, index) => element === other[index] && element.isConnected)
 }
 
 function formatPixelValue(value: number): string {
@@ -962,7 +979,9 @@ class DomAutofitStaticFitSession implements AutofitStaticFitSession {
       = createAutofitClassificationSignature(options.classification)
     this.#transitionSuppression = new AutofitTransitionSuppression(options.flow)
     this.#ensureMeasurementTransitionSuppression()
-    this.#typography = createAutofitTypographyAdapter(options.flow)
+    this.#typography = createAutofitTypographyAdapter(options.flow, {
+      displayMathBlocks: options.classification.displayMathBlocks,
+    })
     this.#spacing = createAutofitSpacingAdapter(options.classification)
     this.#flowStyle = new AutofitFlowStyleAdapter(options.flow)
     this.#baseSpacing = readBaseSpacing(options.flow)

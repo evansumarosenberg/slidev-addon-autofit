@@ -350,6 +350,57 @@ const configuredTiers = { small: 4, large: 4 }
 </v-clicks>
 
 ---
+
+# LaTeX blocks 1
+
+::auto::
+
+LaTeX blocks are supported.
+
+$$
+v \cdot w = \|v\|\,\|w\|\cos(\theta)
+$$
+
+The LaTeX block is horizontally centered; vertical spacing is distributed.
+
+---
+
+# LaTeX blocks 2
+
+::auto::
+
+LaTeX blocks are supported.
+
+The LaTeX block is horizontally centered; vertical spacing is distributed.
+
+$$
+v \cdot w = \|v\|\,\|w\|\cos(\theta)
+$$
+
+---
+
+# LaTeX blocks with reveal
+
+::auto::
+
+<v-clicks>
+
+LaTeX blocks are supported.
+
+$$
+v \cdot w = \|v\|\,\|w\|\cos(\theta)
+$$
+
+$$
+\theta = \operatorname{atan2}(b.y, b.x) - \operatorname{atan2}(a.y, a.x)
+$$
+
+The LaTeX block is horizontally centered; vertical spacing is distributed.
+
+</v-clicks>
+
+
+---
 autofit:
   alignment: top
 ---
@@ -634,6 +685,58 @@ With no declared `auto` slot, the full image allocation does not reserve an unne
 ::image::
 
 ![Placeholder image without AutoFit](/images/autofit_placeholder.jpg)
+
+
+---
+layout: auto-image
+image:
+  position: right
+  size: 38%
+---
+
+# Auto-image: right with LaTeX blocks 1
+
+::image::
+
+![Placeholder image on the right](/images/autofit_placeholder.jpg)
+
+This longer caption demonstrates that caption text is fixed content inside the image region and wraps at the region width before the image is fitted.
+
+::auto::
+
+- The LaTeX block is horizontally centered within the available area.
+
+$$
+v \cdot w = \|v\|\,\|w\|\cos(\theta)
+$$
+
+- Vertical spacing is distributed.
+
+
+---
+layout: auto-image
+image:
+  position: right
+  size: 38%
+---
+
+# Auto-image: right with LaTeX blocks 2
+
+::image::
+
+![Placeholder image on the right](/images/autofit_placeholder.jpg)
+
+This longer caption demonstrates that caption text is fixed content inside the image region and wraps at the region width before the image is fitted.
+
+::auto::
+
+- The LaTeX block is horizontally centered within the available area.
+
+- Vertical spacing is distributed.
+
+$$
+v \cdot w = \|v\|\,\|w\|\cos(\theta)
+$$
 
 ---
 layout: auto-image
@@ -1281,6 +1384,33 @@ const discussionPlan = {
 ```
 
 Keep the implementation note short enough to support the teaching decision rather than replace it.
+
+
+---
+layout: auto-column
+---
+
+# Auto-column: LaTeX blocks
+
+::left::
+
+LaTeX blocks are supported.
+
+$$
+v \cdot w = \|v\|\,\|w\|\cos(\theta)
+$$
+
+The LaTeX block is horizontally centered.
+
+Vertical spacing is distributed.
+
+::right::
+
+Another LaTeX equation in the right column.
+
+$$
+\theta = \operatorname{atan2}(b.y, b.x) - \operatorname{atan2}(a.y, a.x)
+$$
 
 ---
 layout: auto-column
