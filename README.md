@@ -222,11 +222,13 @@ Fixed footer text
 
 One `autofit` configuration applies to both columns. Each column is measured
 independently, and both use the smaller selected tier so their typography stays
-visually consistent. For an eligible `distributed` pair, the selected source
-stays fixed while the target shares its semantic gaps and aligns its first
-rendered line. Text aligns by its first line; a media-only or atomic first unit
-aligns by its visible top edge. Other pairs retain the normal shared-tier
-behavior.
+visually consistent. For an eligible `distributed` pair, the column selecting
+the smaller tier supplies spacing first. If that spacing overflows the other
+column, tighter spacing from the other column is used when both columns fit.
+Spacing is evaluated at the shared tier, with first rendered lines aligned.
+Equal-tier pairs use the tighter spacing. Text aligns by its first line; a
+media-only or atomic first unit aligns by its visible top edge. Other pairs
+retain the normal shared-tier behavior.
 
 For predictable results, use ordinary Markdown and allow AutoFit to control
 font size, line height, and spacing.

@@ -170,6 +170,7 @@ export interface AutoColumnPublishFallbackDecision<Payload = unknown> {
 
 export interface AutoColumnSynchronizeTargetDecision<Payload = unknown> {
   readonly kind: 'synchronize-target'
+  readonly spacingFallback?: boolean
   readonly epoch: number
   readonly tier: number
   readonly terminals: AutoColumnPrivatePair<Payload>
@@ -224,6 +225,7 @@ export class AutoColumnCoordinator<Payload = unknown> {
   #commonTierTerminals: Partial<Record<AutoColumnRole, AutoColumnCommonTierTerminal<Payload>>> = {}
   #commonTier: number | null = null
   #authority: AutoColumnAuthority | null = null
+  #preferredOverflow: AutoColumnPublishSynchronizedCommonTierDecision<Payload> | null = null
   #discarded = false
   #resolved = false
 
@@ -238,6 +240,7 @@ export class AutoColumnCoordinator<Payload = unknown> {
     this.#commonTierTerminals = {}
     this.#commonTier = null
     this.#authority = null
+    this.#preferredOverflow = null
     this.#discarded = false
     this.#resolved = false
     return this.#epoch
@@ -382,6 +385,46 @@ export class AutoColumnCoordinator<Payload = unknown> {
       submission.outcome,
     )
 
+    // Both local presentations were verified at the common typography tier.
+    // Keep the preferred result privately while trying the tighter sibling's
+    // gaps and anchor once. A failed alternative must not replace that result.
+    if (this.#preferredOverflow) {
+      return this.#publishSynchronizedCommonTier(
+        submission.outcome.status === 'synchronized-fit'
+          && decision.kind === 'publish-synchronized-common-tier'
+          ? decision
+          : this.#preferredOverflow,
+      )
+    }
+    const terminals = privatePair(this.#privateTerminals)
+    const authority = this.#authority
+    if (
+      decision.kind === 'publish-synchronized-common-tier'
+      && submission.outcome.status === 'synchronized-overflow'
+      && terminals.left.status === 'managed'
+      && terminals.right.status === 'managed'
+      && terminals.left.tier !== terminals.right.tier
+      && isEligibleSource(authority.targetPresentation)
+      && fullGapComparisonValue(authority.targetPresentation)
+        < fullGapComparisonValue(authority.sourcePresentation)
+    ) {
+      this.#preferredOverflow = decision
+      this.#authority = {
+        source: authority.target,
+        target: authority.source,
+        sourcePresentation: authority.targetPresentation,
+        targetPresentation: authority.sourcePresentation,
+      }
+      return {
+        kind: 'synchronize-target',
+        epoch: this.#epoch,
+        tier: this.#commonTier,
+        terminals,
+        ...this.#authority,
+        spacingFallback: true,
+      }
+    }
+
     if (decision.kind === 'publish-target-unsupported')
       return this.#publishTargetUnsupported(decision)
     return this.#publishSynchronizedCommonTier(decision)
@@ -412,6 +455,7 @@ export class AutoColumnCoordinator<Payload = unknown> {
     this.#commonTierTerminals = {}
     this.#commonTier = null
     this.#authority = null
+    this.#preferredOverflow = null
     this.#discarded = true
     return { kind: 'discard-epoch', epoch: this.#epoch, reason }
   }

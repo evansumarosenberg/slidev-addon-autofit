@@ -211,7 +211,7 @@ $$
 layout: auto-column
 ---
 
-# Existing paired overflow rules
+# Paired spacing fallback
 
 <span data-testid="math-column-overflow" />
 
@@ -286,3 +286,27 @@ $$
 $$
 
 Text after math.
+
+---
+layout: auto-column
+---
+
+# Non-math spacing fallback
+
+<span data-testid="text-column-spacing" />
+
+::left::
+
+First short paragraph.
+
+Second short paragraph.
+
+Third short paragraph.
+
+Fourth short paragraph.
+
+::right::
+
+A width-constrained word.
+
+ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789

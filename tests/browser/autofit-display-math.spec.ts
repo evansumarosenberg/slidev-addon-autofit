@@ -130,21 +130,82 @@ test('direct AutoFit retains its existing typography path', async ({ page }) => 
     (element as HTMLElement).style.getPropertyPriority('margin-block-start'))).toBe('')
 })
 
-test('preserves coordinated overflow when source gaps exceed the other column allocation', async ({ page }) => {
-  const layout = await mathSlide(page, 'math-column-overflow')
-  const left = layout.locator('[data-autofit-role="left"]')
-  const right = layout.locator('[data-autofit-role="right"]')
-  await waitForAutofitPublication(left)
-  await waitForAutofitPublication(right)
-  await expect(left).toHaveAttribute('data-autofit-state', 'overflow')
-  await expect(right).toHaveAttribute('data-autofit-state', 'fit')
-  expect(await left.getAttribute('data-autofit-tier')).toBe(await right.getAttribute('data-autofit-tier'))
-  expect(await left.evaluate(element => {
-    const viewport = element.querySelector('.autofit__viewport')!.getBoundingClientRect()
-    const flow = element.querySelector('.autofit__flow')!.getBoundingClientRect()
-    return flow.bottom > viewport.bottom + 0.5
-  })).toBe(true)
-})
+for (const marker of ['math-column-overflow', 'text-column-spacing']) {
+  test(`${marker}: uses tighter spacing when the smaller-tier column gaps overflow its sibling`, async ({ page }) => {
+    const warnings: string[] = []
+    page.on('console', message => {
+      if (message.type() === 'warning')
+        warnings.push(message.text())
+    })
+    const layout = await mathSlide(page, marker)
+    const left = layout.locator('[data-autofit-role="left"]')
+    const right = layout.locator('[data-autofit-role="right"]')
+    await waitForAutofitPublication(left)
+    await waitForAutofitPublication(right)
+    await expect(left).toHaveAttribute('data-autofit-state', 'fit')
+    await expect(right).toHaveAttribute('data-autofit-state', 'fit')
+    expect(await left.getAttribute('data-autofit-tier')).toBe(await right.getAttribute('data-autofit-tier'))
+    expect(Number(await right.getAttribute('data-autofit-private-tier')))
+      .toBeLessThan(Number(await left.getAttribute('data-autofit-private-tier')))
+    expect(await left.getAttribute('data-autofit-tier')).toBe(await right.getAttribute('data-autofit-private-tier'))
+    expect(await left.evaluate(element => {
+      const viewport = element.querySelector('.autofit__viewport')!.getBoundingClientRect()
+      const flow = element.querySelector('.autofit__flow')!.getBoundingClientRect()
+      return flow.bottom > viewport.bottom + 0.5
+    })).toBe(false)
+    const leftGaps = await visualGaps(left)
+    const rightGaps = await visualGaps(right)
+    for (const gap of [...leftGaps, ...rightGaps])
+      expect(Math.abs(gap - leftGaps[0])).toBeLessThan(0.75)
+    const firstLine = (root: Locator) => root.locator('.autofit__flow > p').first().evaluate(element => {
+      const range = document.createRange()
+      range.selectNodeContents(element)
+      return range.getBoundingClientRect().top
+    })
+    expect(Math.abs(await firstLine(left) - await firstLine(right))).toBeLessThan(0.75)
+    expect(warnings.filter(warning => warning.includes('AUTOFIT OVERFLOW'))).toEqual([])
+  })
+}
+
+for (const failure of ['overflow', 'unsupported-anchor'] as const) {
+  test(`retains the original overflow presentation after tighter candidate ${failure}`, async ({ page }) => {
+    await page.addInitScript((failure) => {
+      Object.assign(window, {
+        __spacingAttempts: [] as (string | null)[],
+        __slidevAutofitTestHooks: {
+          forceCoordinatedTargetOverflow: () => failure === 'overflow',
+          forceCoordinatedCandidateAnchorUnsupportedReason(viewport: HTMLElement) {
+            return failure === 'unsupported-anchor'
+              && viewport.closest('.autofit')?.getAttribute('data-autofit-role') === 'left'
+              ? 'visual-edge-nonfinite'
+              : null
+          },
+          afterCoordinatedGapPlanApplied(viewport: HTMLElement) {
+            if (!viewport.closest('.slidev-layout')?.querySelector('[data-testid="math-column-overflow"]'))
+              return
+            ;(window as typeof window & { __spacingAttempts: (string | null)[] })
+              .__spacingAttempts.push(viewport.closest('.autofit')!.getAttribute('data-autofit-role'))
+          },
+        },
+      })
+    }, failure)
+    const layout = await mathSlide(page, 'math-column-overflow')
+    const left = layout.locator('[data-autofit-role="left"]')
+    const right = layout.locator('[data-autofit-role="right"]')
+    await waitForAutofitPublication(left)
+    await waitForAutofitPublication(right)
+    await expect(left).toHaveAttribute('data-autofit-state', 'overflow')
+    await expect(right).toHaveAttribute('data-autofit-state', 'fit')
+    const attempts = await page.evaluate(() =>
+      (window as typeof window & { __spacingAttempts: (string | null)[] }).__spacingAttempts)
+    expect(attempts)
+      .toEqual(failure === 'overflow' ? ['left', 'right'] : ['left'])
+    const leftGaps = await visualGaps(left)
+    const rightGaps = await visualGaps(right)
+    for (const gap of leftGaps)
+      expect(Math.abs(gap - rightGaps[0])).toBeLessThan(0.75)
+  })
+}
 
 for (const [marker, alignment] of [['math-top', 'top'], ['math-center', 'middle'], ['math-bottom', 'bottom']]) {
   test(`display blocks preserve ${alignment} alignment`, async ({ page }) => {

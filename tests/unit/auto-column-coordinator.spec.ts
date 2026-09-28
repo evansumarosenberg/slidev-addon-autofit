@@ -243,6 +243,65 @@ describe('auto-column common-tier finalization', () => {
 })
 
 describe('auto-column distributed-gap authority', () => {
+  it.each(['left', 'right'] as const)('tries tighter common-tier spacing after %s-source overflow', (source) => {
+    const coordinator = createAutoColumnCoordinator()
+    const target = source === 'left' ? 'right' : 'left'
+    const loose = localPresentation('distributed', 'distributed', 40, 20)
+    const tight = localPresentation('distributed', 'distributed', null, 8)
+    const { epoch } = prepareManagedCommonTier(coordinator,
+      source === 'left' ? 1 : 4, source === 'right' ? 1 : 4,
+      source === 'left' ? loose : tight, source === 'right' ? loose : tight)
+    expect(coordinator.submitTargetSynchronization({ role: target, epoch, outcome: { status: 'synchronized-overflow' } }))
+      .toMatchObject({ kind: 'synchronize-target', tier: 1, source: target, target: source, spacingFallback: true })
+    expect(coordinator.submitTargetSynchronization({ role: source, epoch, outcome: { status: 'synchronized-fit' } }))
+      .toMatchObject({ kind: 'publish-synchronized-common-tier', tier: 1, source: target, target: source,
+        targetTerminal: { status: 'synchronized-fit' } })
+  })
+
+  it.each(['synchronized-overflow', 'unsupported'] as const)('retains the preferred overflow when tighter spacing is %s', (status) => {
+    const coordinator = createAutoColumnCoordinator()
+    const { epoch } = prepareManagedCommonTier(coordinator, 1, 4,
+      localPresentation('distributed', 'distributed', 40, 20), localPresentation())
+    coordinator.submitTargetSynchronization({ role: 'right', epoch, outcome: { status: 'synchronized-overflow' } })
+    expect(coordinator.submitTargetSynchronization({ role: 'left', epoch, outcome: { status } }))
+      .toMatchObject({ kind: 'publish-synchronized-common-tier', source: 'left', target: 'right',
+        targetTerminal: { status: 'synchronized-overflow' } })
+  })
+
+  it('keeps preferred spacing when it fits despite a tighter alternative', () => {
+    const coordinator = createAutoColumnCoordinator()
+    const { epoch } = prepareManagedCommonTier(coordinator, 1, 4,
+      localPresentation('distributed', 'distributed', 40, 20), localPresentation())
+    expect(coordinator.submitTargetSynchronization({ role: 'right', epoch, outcome: { status: 'synchronized-fit' } }))
+      .toMatchObject({ kind: 'publish-synchronized-common-tier', source: 'left', target: 'right' })
+  })
+
+  it.each([
+    localPresentation('distributed', 'distributed', 40, 20),
+    localPresentation('distributed', 'distributed', 50, 25),
+    localPresentation('distributed', 'distributed', null, null),
+    localPresentation('top', 'top', 12, 6),
+  ])('does not retry equal, looser, or ineligible alternative spacing %#', (alternative) => {
+    const coordinator = createAutoColumnCoordinator()
+    const { epoch } = prepareManagedCommonTier(coordinator, 1, 4,
+      localPresentation('distributed', 'distributed', 40, 20), alternative)
+    expect(coordinator.submitTargetSynchronization({ role: 'right', epoch, outcome: { status: 'synchronized-overflow' } }))
+      .toMatchObject({ kind: 'publish-synchronized-common-tier', source: 'left', target: 'right' })
+  })
+
+  it('invalidates a pending spacing fallback and rejects its stale terminal', () => {
+    const coordinator = createAutoColumnCoordinator()
+    const { epoch } = prepareManagedCommonTier(coordinator, 1, 4,
+      localPresentation('distributed', 'distributed', 40, 20), localPresentation())
+    coordinator.submitTargetSynchronization({ role: 'right', epoch, outcome: { status: 'synchronized-overflow' } })
+    coordinator.invalidate('left')
+    expect(coordinator.submitTargetSynchronization({ role: 'left', epoch, outcome: { status: 'synchronized-fit' } }))
+      .toMatchObject({ kind: 'ignored', reason: 'stale-epoch' })
+    const next = prepareManagedCommonTier(coordinator, 1, 4, localPresentation(), localPresentation())
+    expect(coordinator.submitTargetSynchronization({ role: 'right', epoch: next.epoch, outcome: { status: 'synchronized-fit' } }))
+      .toMatchObject({ kind: 'publish-synchronized-common-tier', source: 'left', target: 'right' })
+  })
+
   it.each([true, false])('selects the smaller unequal private tier independently of %s-first local completion', (leftFirst) => {
     for (const [leftTier, rightTier, source] of [
       [1, 3, 'left'],

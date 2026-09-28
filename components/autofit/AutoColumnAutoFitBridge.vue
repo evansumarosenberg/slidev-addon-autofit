@@ -97,6 +97,14 @@ function enact(decision: AutoColumnCoordinatorDecision): void {
         return
       }
       if (candidate.status === 'unsupported') {
+        if (decision.spacingFallback) {
+          enact(coordinator.submitTargetSynchronization({
+            role: decision.target,
+            epoch: decision.epoch,
+            outcome: { status: 'unsupported' },
+          }))
+          return
+        }
         // Retain the source's fallback privately, then let the coordinator
         // publish the pair through its existing common-tier fallback path.
         sourceParticipant.prepareStartingAnchorUnsupported(decision.epoch)
