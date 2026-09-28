@@ -191,13 +191,13 @@ const rawConfig = computed(() => semanticDistributed.value
         <template v-else-if="semanticUnequalLeft">
           <p
             data-testid="coordination-left-unequal-a"
-            style="font-size: 100px; line-height: 160px; white-space: nowrap"
+            style="font-size: 100px; line-height: 156px; white-space: nowrap"
           >
             I
           </p>
           <p
             data-testid="coordination-left-unequal-b"
-            style="font-size: 100px; line-height: 160px; white-space: nowrap"
+            style="font-size: 100px; line-height: 156px; white-space: nowrap"
           >
             I
           </p>
@@ -266,13 +266,13 @@ const rawConfig = computed(() => semanticDistributed.value
         <template v-else-if="semanticUnequal">
           <p
             data-testid="coordination-right-unequal-a"
-            style="font-size: 100px; line-height: 160px; white-space: nowrap"
+            style="font-size: 100px; line-height: 156px; white-space: nowrap"
           >
             I
           </p>
           <p
             data-testid="coordination-right-unequal-b"
-            style="font-size: 100px; line-height: 160px; white-space: nowrap"
+            style="font-size: 100px; line-height: 156px; white-space: nowrap"
           >
             I
           </p>
