@@ -121,7 +121,7 @@
 }
 
 .auto-image-layout--top > .auto-image-layout__stage {
-  margin-block-start: 0.5rem;
+  margin-block-start: 0.625rem;
 }
 
 .auto-image-layout__image-track,
