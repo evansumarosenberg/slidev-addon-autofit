@@ -452,6 +452,14 @@ export interface AutofitVisualBoundaryMeasurementOptions {
 }
 
 export interface AutofitComputedBoxStyle {
+  /** Used only for painted inline-math bounds and their internal clipping. */
+  readonly overflowX?: string
+  readonly overflowY?: string
+  readonly borderTopWidth?: string
+  readonly borderRightWidth?: string
+  readonly borderBottomWidth?: string
+  readonly borderLeftWidth?: string
+  readonly backgroundColor?: string
   readonly width: string
   readonly height: string
   readonly display: string

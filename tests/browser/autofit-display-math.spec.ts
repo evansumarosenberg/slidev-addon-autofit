@@ -179,6 +179,24 @@ test('genuinely wide inline radicals still report overflow', async ({ page }) =>
   })).toBe(true)
 })
 
+for (const kind of ['left', 'center', 'radical', 'rule']) {
+  test(`inline ${kind} overhang reports genuine negative overflow`, async ({ page }) => {
+    const layout = await mathSlide(page, `math-inline-overhang-${kind}`)
+    const root = layout.locator('.autofit')
+    await waitForAutofitPublication(root)
+    await expect(root.locator('.katex-html')).toHaveCount(1)
+    await expect(root).toHaveAttribute('data-autofit-state', 'overflow')
+    await expect(root.locator('.autofit__overflow-badge')).toBeVisible()
+    expect(await root.evaluate(element => {
+      const viewport = element.querySelector('.autofit__viewport')!.getBoundingClientRect()
+      const inner = element.querySelector('.katex-inner')!
+      // \clap offsets the inner child; its positioned wrapper stays at x=0.
+      return [inner, ...inner.children].some(paint =>
+        paint.getBoundingClientRect().left < viewport.left - 1)
+    })).toBe(true)
+  })
+}
+
 test('direct AutoFit retains its existing typography path', async ({ page }) => {
   const layout = await mathSlide(page, 'math-direct')
   const root = layout.locator('.autofit')

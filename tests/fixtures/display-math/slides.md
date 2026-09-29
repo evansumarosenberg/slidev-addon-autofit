@@ -378,3 +378,59 @@ layout: auto-default
 ::auto::
 
 An oversized formula: $\sqrt{\rule{120em}{1em}}$.
+
+---
+layout: auto-default
+---
+
+# Visible left overhang
+
+<span data-testid="math-inline-overhang-left" />
+
+::auto::
+
+$\llap{MMMMMMMM}x$
+
+The preceding formula paints to the left of its line box.
+
+---
+layout: auto-default
+---
+
+# Visible centered overhang
+
+<span data-testid="math-inline-overhang-center" />
+
+::auto::
+
+$\clap{MMMMMMMM}x$
+
+The preceding formula paints on both sides of its line box.
+
+---
+layout: auto-default
+---
+
+# Visible radical overhang
+
+<span data-testid="math-inline-overhang-radical" />
+
+::auto::
+
+$\mathllap{\sqrt{x^2+y^2}}x$
+
+The radical has clipped construction paths but still paints left of its line box.
+
+---
+layout: auto-default
+---
+
+# Visible rule overhang
+
+<span data-testid="math-inline-overhang-rule" />
+
+::auto::
+
+$\llap{\rule{8em}{1em}}x$
+
+The rule paints outside the line box without any glyph text.

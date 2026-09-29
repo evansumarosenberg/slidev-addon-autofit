@@ -62,6 +62,13 @@ function defaultReadComputedStyle(element: Element): AutofitComputedBoxStyle {
 
   const style = view.getComputedStyle(element)
   return {
+    overflowX: style.overflowX,
+    overflowY: style.overflowY,
+    borderTopWidth: style.borderTopWidth,
+    borderRightWidth: style.borderRightWidth,
+    borderBottomWidth: style.borderBottomWidth,
+    borderLeftWidth: style.borderLeftWidth,
+    backgroundColor: style.backgroundColor,
     width: style.width,
     height: style.height,
     display: style.display,
@@ -374,11 +381,20 @@ function calculateBounds(
   const ownedTextFormattingElements
     = deriveOwnedTextFormattingElements(classification)
   const mathInternals = new Set<Element>()
-  const inlineMathBoxes = new Set<Element>()
+  const inlineMathBoxes = new Map<Element, Element>()
+  const mathStyles = new Map<Element, AutofitComputedBoxStyle>()
+  const readMathStyle = (element: Element) => {
+    let style = mathStyles.get(element)
+    if (!style) {
+      style = reads.readComputedStyle(element)
+      mathStyles.set(element, style)
+    }
+    return style
+  }
   for (const math of classification.inlineMath ?? []) {
-    const measured = new Set(inlineMathGeometryElements(math))
+    const measured = new Set(inlineMathGeometryElements(math, readMathStyle))
     for (const element of measured)
-      inlineMathBoxes.add(element)
+      inlineMathBoxes.set(element, math.root)
     for (const descendant of math.root.querySelectorAll('*')) {
       if (!measured.has(descendant))
         mathInternals.add(descendant)
@@ -393,8 +409,8 @@ function calculateBounds(
   }
 
   for (const descendant of flow.querySelectorAll('*')) {
-    // Measure KaTeX's visual line boxes, not its clipped accessibility tree or
-    // deliberately oversized SVG construction paths inside those line boxes.
+    // Omit accessibility/layout-only internals. Inline painted fragments below
+    // are clipped to KaTeX's own containers, never to the AutoFit viewport.
     if (mathInternals.has(descendant))
       continue
     const clientRectCount = reads.readClientRectCount(descendant)
@@ -418,12 +434,39 @@ function calculateBounds(
     if (!isFiniteRect(rectangle))
       return null
 
-    const { left, right, top, bottom } = convertAutofitRectToLocal(
+    let { left, right, top, bottom } = convertAutofitRectToLocal(
       rectangle,
       space,
     )
     if (![left, right, top, bottom].every(Number.isFinite))
       return null
+
+    const mathRoot = inlineMathBoxes.get(descendant)
+    if (mathRoot && descendant !== mathRoot) {
+      for (let ancestor = descendant.parentElement; ancestor; ancestor = ancestor.parentElement) {
+        const style = readMathStyle(ancestor)
+        const clipsInline = /^(hidden|clip|auto|scroll)$/.test(style.overflowX ?? '')
+        const clipsBlock = /^(hidden|clip|auto|scroll)$/.test(style.overflowY ?? '')
+        if (clipsInline || clipsBlock) {
+          const clipRect = reads.readBoundingRect(ancestor)
+          if (!isFiniteRect(clipRect))
+            return null
+          const clip = convertAutofitRectToLocal(clipRect, space)
+          if (clipsInline) {
+            left = Math.max(left, clip.left)
+            right = Math.min(right, clip.right)
+          }
+          if (clipsBlock) {
+            top = Math.max(top, clip.top)
+            bottom = Math.min(bottom, clip.bottom)
+          }
+        }
+        if (ancestor === mathRoot)
+          break
+      }
+      if (right < left || bottom < top)
+        continue
+    }
 
     minInline = Math.min(minInline, left)
     maxInline = Math.max(maxInline, right)

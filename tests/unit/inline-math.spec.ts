@@ -49,7 +49,9 @@ describe('managed inline math geometry', () => {
     let lineBounds = { left: 20, right: 120, top: 20, bottom: 60 }
     let scrollWidth = 500
     const reads = {
-      readComputedStyle: () => ({ width: '500px', height: '300px', display: 'inline', position: 'static',
+      readComputedStyle: (element: Element) => ({ width: '500px', height: '300px', display: 'inline', position: 'static',
+        overflowX: element.localName === 'svg' ? 'hidden' : 'visible',
+        overflowY: element.localName === 'svg' ? 'hidden' : 'visible',
         transform: 'none', translate: 'none', rotate: 'none', scale: 'none',
         marginTop: '0px', marginRight: '0px', marginBottom: '0px', marginLeft: '0px' }),
       readBoundingRect: (element: Element) => {
@@ -92,5 +94,46 @@ describe('managed inline math geometry', () => {
     const element = flow.querySelector(selector)!
     element.replaceWith(element.cloneNode(true))
     expect(areAutofitClassificationSignaturesEqual(before, signature())).toBe(false)
+  })
+
+  it.each(['text', 'border', 'svg'])('retains visible %s overhangs and honors internal axis clipping', (kind) => {
+    const { viewport, flow } = fixture()
+    const line = flow.querySelector('.base')!
+    const paint = kind === 'svg' ? line.querySelector('path')! : line.querySelector('span')!
+    if (kind === 'border')
+      paint.textContent = ''
+    let clipX = false
+    let clipY = false
+    let bounds = { left: -40, right: 100, top: 20, bottom: 60 }
+    const measure = () => measureAutofitGeometry({
+      viewport, flow, classification: classifyAutofitContent(flow, { displayMath: true }),
+      reads: {
+        readComputedStyle: element => ({ width: '500px', height: '300px', display: 'inline', position: 'static',
+          transform: 'none', translate: 'none', rotate: 'none', scale: 'none',
+          marginTop: '0px', marginRight: '0px', marginBottom: '0px', marginLeft: '0px',
+          borderBottomWidth: element === paint && kind === 'border' ? '1px' : '0px',
+          overflowX: element === line && clipX ? 'hidden' : 'visible',
+          overflowY: element === line && clipY ? 'hidden' : 'visible' }),
+        readBoundingRect: element => {
+          const rect = element === paint ? bounds : { left: 0, right: 500, top: 0, bottom: 300 }
+          return { ...rect, width: rect.right - rect.left, height: rect.bottom - rect.top }
+        },
+        readClientRectCount: () => 1,
+        readScrollExtent: () => ({ inlineSize: 500, blockSize: 300 }),
+      },
+    })
+    expect(measure()).toMatchObject({ fits: false, bounds: { minInline: -40 } })
+    clipY = true
+    expect(measure()).toMatchObject({ fits: false })
+    clipX = true
+    expect(measure()).toMatchObject({ fits: true })
+    bounds = { left: 10, right: 100, top: -40, bottom: 60 }
+    clipY = false
+    expect(measure()).toMatchObject({ fits: false, bounds: { minBlock: -40 } })
+    clipY = true
+    expect(measure()).toMatchObject({ fits: true })
+    // Completely clipped paint must not contribute an inverted rectangle.
+    bounds = { left: -100, right: -40, top: 20, bottom: 60 }
+    expect(measure()).toMatchObject({ fits: true })
   })
 })
