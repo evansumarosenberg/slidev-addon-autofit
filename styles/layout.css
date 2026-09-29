@@ -120,7 +120,7 @@
   overflow: hidden;
 }
 
-.auto-image-layout--top > .auto-image-layout__stage {
+:is(.auto-image-layout--top, .auto-image-layout--center) > .auto-image-layout__stage {
   margin-block-start: 0.625rem;
 }
 
@@ -135,10 +135,6 @@
 .auto-image-layout__auto-track.autofit {
   width: 100%;
   height: 100%;
-}
-
-.auto-image-layout__semantic-probe {
-  display: none !important;
 }
 
 .auto-image-layout__footer {
@@ -165,7 +161,6 @@
 .auto-image-layout__diagnostics :is(
   .auto-image-layout__config-error-badge,
   .auto-image-layout__overflow-badge,
-  .auto-image-layout__unsupported-badge,
   .auto-image-layout__image-overflow-badge,
   .auto-image-layout__image-unsupported-badge,
   .auto-image-layout__fixed-overflow-badge
@@ -204,7 +199,6 @@
 
 .auto-image-layout--config-error,
 .auto-image-layout--split-overflow,
-.auto-image-layout--unsupported,
 .auto-image-layout .auto-image--overflow,
 .auto-image-layout .auto-image--unsupported {
   box-shadow: inset 0 0 0 2px var(--slidev-autofit-diagnostic-color);
@@ -220,7 +214,6 @@
   :is(
     .auto-image-layout__config-error-badge,
     .auto-image-layout__overflow-badge,
-    .auto-image-layout__unsupported-badge,
     .auto-image-layout__image-overflow-badge,
     .auto-image-layout__image-unsupported-badge,
     .autofit__overflow-badge,

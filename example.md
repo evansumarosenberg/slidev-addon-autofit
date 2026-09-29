@@ -827,20 +827,24 @@ The image keeps its full authoritative height while the declared AutoFit slot st
 layout: auto-image
 image:
   position: center
-  size: 45%
+  size: 75%
 ---
 
-# Auto-image: center with AutoFit content (intentional)
+# Auto-image: center with AutoFit content
 
-Center mode has no valid AutoFit placement. Substantive `auto` content should report `AUTO IMAGE UNSUPPORTED`.
+The centered image area leaves room for AutoFit content below, above the fixed footer.
 
 ::image::
 
-![Placeholder image with unsupported center content](/images/autofit_placeholder.jpg)
+![Placeholder image centered above AutoFit content](/images/autofit_placeholder.jpg)
 
 ::auto::
 
-- Center mode cannot place this substantive AutoFit content.
+Center mode places this content in the remaining space.
+
+::footer::
+
+Fixed footer below the centered image and AutoFit content.
 
 ---
 layout: auto-image

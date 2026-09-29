@@ -3,9 +3,10 @@ import { computed, ref } from 'vue'
 import AutoImageLayout from '../../../layouts/auto-image.vue'
 
 const landscapeSource = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect width='400' height='200' fill='%237a0019'/%3E%3C/svg%3E"
-const position = ref<'left' | 'right' | 'top' | 'bottom'>('left')
+const position = ref<'left' | 'right' | 'top' | 'bottom' | 'center'>('left')
 const size = ref<'0%' | '35%' | '96%' | '97%' | '100%'>('35%')
 const showAuto = ref(true)
+const overflowAuto = ref(false)
 const showFooter = ref(false)
 const invalid = ref(false)
 const imageMode = ref<'fit' | 'unsupported' | 'pending'>('fit')
@@ -38,6 +39,9 @@ function setPendingImage(): void {
       <button data-testid="auto-image-layout-set-bottom" @click="position = 'bottom'">
         Bottom
       </button>
+      <button data-testid="auto-image-layout-set-center" @click="position = 'center'">
+        Center
+      </button>
       <button data-testid="auto-image-layout-set-zero" @click="size = '0%'">
         Zero
       </button>
@@ -61,6 +65,9 @@ function setPendingImage(): void {
       </button>
       <button data-testid="auto-image-layout-toggle-auto" @click="showAuto = !showAuto">
         Toggle auto
+      </button>
+      <button data-testid="auto-image-layout-set-auto-overflow" @click="overflowAuto = true">
+        Overflow auto
       </button>
       <button data-testid="auto-image-layout-toggle-footer" @click="showFooter = !showFooter">
         Toggle footer
@@ -91,7 +98,8 @@ function setPendingImage(): void {
       </template>
 
       <template #auto v-if="showAuto">
-        <p data-testid="auto-image-layout-lifecycle-auto">Same-instance auto content</p>
+        <div v-if="overflowAuto" style="height: 1000px">Overflowing center AutoFit content</div>
+        <p v-else data-testid="auto-image-layout-lifecycle-auto">Same-instance auto content</p>
       </template>
 
       <template #footer v-if="showFooter">

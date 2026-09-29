@@ -34,11 +34,7 @@ import type {
 import type {
   AutoImageLayoutLifecycle,
 } from '../utils/auto-image/layout-lifecycle'
-import { classifyAutofitContent } from '../utils/autofit/classify'
 import { AUTOFIT_DIAGNOSTIC_PREFIX } from '../utils/autofit/diagnostic-prefix'
-import {
-  isAutofitClassificationSemanticallyEmpty,
-} from '../utils/autofit/semantic-content'
 import LayoutAutoFitBridge from '../components/autofit/LayoutAutoFitBridge.vue'
 import { useLayoutOverflow } from '../utils/autofit/useLayoutOverflow'
 import type { AutoImageStateReport } from '../components/AutoImage.vue'
@@ -68,7 +64,6 @@ const hasDefault = computed(() => slotPresence.value.default)
 const hasAuto = computed(() => slotPresence.value.auto)
 const hasFooter = computed(() => slotPresence.value.footer)
 const normalized = computed(() => normalizeAutoImageConfig(props.image))
-const isCenter = computed(() => normalized.value.config.position === 'center')
 const configError = computed(() => [...new Set(
   normalized.value.errors.map(error => error.code),
 )].join(','))
@@ -82,13 +77,10 @@ const layout = ref<HTMLElement | null>(null)
 const main = ref<HTMLElement | null>(null)
 const stage = ref<HTMLElement | null>(null)
 const footer = ref<HTMLElement | null>(null)
-const probe = ref<HTMLElement | null>(null)
 const splitOverflow = ref(false)
-const centerUnsupported = ref(false)
 const imageReport = ref<AutoImageStateReport>({ state: 'pending', reason: null })
 const { overflowing: fixedOverflow } = useLayoutOverflow({ layout, main, footer })
 
-let probeObserver: MutationObserver | null = null
 let layoutLifecycle: AutoImageLayoutLifecycle | null = null
 let splitFrame: number | null = null
 let layoutGeneration = 0
@@ -97,10 +89,10 @@ let mounted = false
 const warnedConfigurationSignatures = new Set<string>()
 
 const stageStyle = computed(() => normalized.value.valid
-  ? createAutoImageStageStyle(normalized.value.config, hasAuto.value && !isCenter.value)
+  ? createAutoImageStageStyle(normalized.value.config, hasAuto.value)
   : {})
 const imageTrackStyle = computed(() => normalized.value.valid
-  ? createAutoImageImageTrackStyle(normalized.value.config, hasAuto.value && !isCenter.value)
+  ? createAutoImageImageTrackStyle(normalized.value.config, hasAuto.value)
   : {})
 const autoTrackStyle = computed(() => normalized.value.valid
   ? createAutoImageAutoTrackStyle(normalized.value.config)
@@ -115,22 +107,6 @@ function warnInvalidConfiguration(): void {
   console.warn(
     `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTO IMAGE CONFIGURATION ERROR (${configError.value}); image and AutoFit regions are not mounted.`,
   )
-}
-
-function evaluateCenterProbe(): void {
-  if (!isCenter.value || !hasAuto.value || !normalized.value.valid || !probe.value) {
-    centerUnsupported.value = false
-    return
-  }
-
-  const classification = classifyAutofitContent(probe.value)
-  const nextUnsupported = !isAutofitClassificationSemanticallyEmpty(classification)
-  if (nextUnsupported && !centerUnsupported.value) {
-    console.warn(
-      `${AUTOFIT_DIAGNOSTIC_PREFIX} AUTO IMAGE UNSUPPORTED (center-with-auto-content): center mode cannot place substantive AutoFit content.`,
-    )
-  }
-  centerUnsupported.value = nextUnsupported
 }
 
 function boxSnapshot(element: HTMLElement | null): AutoImageLayoutGeometryBox {
@@ -178,21 +154,6 @@ function syncTrackObservers(): void {
   )
 }
 
-function syncProbeObserver(): void {
-  probeObserver?.disconnect()
-  probeObserver = null
-  if (!probe.value)
-    return
-
-  probeObserver = new MutationObserver(() => invalidateLayout('content'))
-  probeObserver.observe(probe.value, {
-    attributes: true,
-    characterData: true,
-    childList: true,
-    subtree: true,
-  })
-}
-
 function evaluateSplitOverflow(generation: number): void {
   splitFrame = null
   if (!mounted || generation !== layoutGeneration)
@@ -208,22 +169,20 @@ function evaluateSplitOverflow(generation: number): void {
 
   syncTrackObservers()
   const snapshot = readGeometrySnapshot()
-  if (!snapshot || !stage.value || !snapshot.autoDeclared || isCenter.value) {
+  if (!snapshot || !stage.value || !snapshot.autoDeclared) {
     lastGeometryFingerprint = snapshot
       ? createAutoImageLayoutGeometryFingerprint(snapshot)
       : null
     splitOverflow.value = false
-    evaluateCenterProbe()
     return
   }
 
   const fingerprint = createAutoImageLayoutGeometryFingerprint(snapshot)
   const changed = fingerprint !== lastGeometryFingerprint
   lastGeometryFingerprint = fingerprint
-  if (!changed && !centerUnsupported.value) {
+  if (!changed) {
     // A stable snapshot has no state transition to publish. The fingerprint
     // still includes the computed gap, even when the track boxes are stable.
-    evaluateCenterProbe()
     return
   }
 
@@ -243,7 +202,6 @@ function evaluateSplitOverflow(generation: number): void {
     )
   }
   splitOverflow.value = overflow
-  evaluateCenterProbe()
 }
 
 function scheduleLayoutFrame(): void {
@@ -287,16 +245,14 @@ onMounted(async () => {
     })
   }
   await nextTick()
-  syncProbeObserver()
   invalidateLayout('content')
 })
 
-watch([normalized, isCenter, hasDefault, hasAuto, hasFooter], async () => {
+watch([normalized, hasDefault, hasAuto, hasFooter], async () => {
   warnInvalidConfiguration()
   await nextTick()
   if (!mounted)
     return
-  syncProbeObserver()
   invalidateLayout('configuration')
 })
 
@@ -321,7 +277,6 @@ onUpdated(() => {
   }
 
   slotPresence.value = next
-  syncProbeObserver()
   invalidateLayout('content')
 })
 
@@ -331,8 +286,6 @@ onBeforeUnmount(() => {
   if (splitFrame !== null)
     cancelAnimationFrame(splitFrame)
   splitFrame = null
-  probeObserver?.disconnect()
-  probeObserver = null
   layoutLifecycle?.dispose()
   layoutLifecycle = null
 })
@@ -345,14 +298,13 @@ onBeforeUnmount(() => {
     :class="{
       'auto-image-layout--config-error': !normalized.valid,
       'auto-image-layout--top': normalized.valid && normalized.config.position === 'top',
+      'auto-image-layout--center': normalized.valid && normalized.config.position === 'center',
       'auto-image-layout--split-overflow': splitOverflow,
-      'auto-image-layout--unsupported': centerUnsupported,
       'auto-image-layout--overflow': fixedOverflow,
     }"
     :data-auto-image-config-error="normalized.valid ? undefined : configError"
     :data-auto-image-layout-overflow="splitOverflow ? 'true' : undefined"
     :data-auto-image-layout-overflow-reason="splitOverflow ? 'region-gap' : undefined"
-    :data-auto-image-layout-unsupported-reason="centerUnsupported ? 'center-with-auto-content' : undefined"
     :data-layout-overflow="fixedOverflow ? 'true' : undefined"
   >
     <div ref="main" class="auto-image-layout__main">
@@ -375,24 +327,13 @@ onBeforeUnmount(() => {
         </div>
 
         <LayoutAutoFitBridge
-          v-if="hasAuto && !isCenter"
+          v-if="hasAuto"
           class="auto-image-layout__auto-track"
           :style="autoTrackStyle"
           :raw-config="props.autofit"
         >
           <slot name="auto" />
         </LayoutAutoFitBridge>
-
-        <div
-          v-if="isCenter && hasAuto"
-          ref="probe"
-          class="auto-image-layout__semantic-probe"
-          hidden
-          inert
-          aria-hidden="true"
-        >
-          <slot name="auto" />
-        </div>
       </template>
 
       <div class="auto-image-layout__diagnostics" aria-hidden="true">
@@ -404,10 +345,6 @@ onBeforeUnmount(() => {
           v-if="splitOverflow"
           class="auto-image-layout__overflow-badge"
         >AUTO IMAGE LAYOUT OVERFLOW</span>
-        <span
-          v-if="centerUnsupported"
-          class="auto-image-layout__unsupported-badge"
-        >AUTO IMAGE UNSUPPORTED</span>
         <span
           v-if="normalized.valid && imageReport.state === 'overflow'"
           class="auto-image-layout__image-overflow-badge"

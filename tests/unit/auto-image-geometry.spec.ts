@@ -7,7 +7,9 @@ import {
   calculateContainFit,
 } from '../../utils/auto-image/geometry'
 import {
+  createAutoImageAutoTrackStyle,
   createAutoImageLayoutGeometryFingerprint,
+  createAutoImageStageStyle,
   hasAutoImageSplitOverflow,
 } from '../../utils/auto-image/layout'
 
@@ -513,6 +515,7 @@ describe('auto-image split geometry', () => {
     ['right', 1000.0004, 800.0004],
     ['top', 1000.0004, 800.0004],
     ['bottom', 1000.0004, 800.0004],
+    ['center', 1000.0004, 800.0004],
   ] as const)('keeps an exact %s 100%% allocation below a zero gap', (position, availableInlineSize, availableBlockSize) => {
     expect(hasAutoImageSplitOverflow(
       { position, size: 100 },
@@ -652,7 +655,7 @@ describe('auto-image split geometry', () => {
       availableBlockSize: 500,
       imagePercentage: 40,
       regionGap: 16,
-      autoDeclared: true,
+      autoDeclared: false,
     })
 
     expect(result).toMatchObject({
@@ -666,5 +669,38 @@ describe('auto-image split geometry', () => {
       blankBefore: 300,
       blankAfter: 300,
     })
+  })
+
+  it('places center AutoFit below a centered image in the block remainder', () => {
+    const result = calculateAutoImageSplitGeometry({
+      position: 'center',
+      availableInlineSize: 1000,
+      availableBlockSize: 500,
+      imagePercentage: 40,
+      regionGap: 16,
+      autoDeclared: true,
+    })
+
+    expect(result).toMatchObject({
+      axis: 'block',
+      order: 'center',
+      imageInlineSize: 400,
+      imageBlockSize: 200,
+      imageInlineOffset: 300,
+      autoInlineSize: 1000,
+      autoBlockSize: 284,
+      autoBlockOffset: 216,
+      gapSize: 16,
+      splitOverflow: false,
+    })
+    expect(createAutoImageStageStyle({ position: 'center', size: 40 }, true)).toEqual({
+      gridTemplateColumns: 'minmax(0, 1fr) 40% minmax(0, 1fr)',
+      gridTemplateRows: '40% var(--slidev-auto-image-region-gap) minmax(0, calc(100% - 40% - var(--slidev-auto-image-region-gap)))',
+    })
+    expect(createAutoImageAutoTrackStyle({ position: 'center', size: 40 })).toEqual({
+      gridColumn: '1 / -1',
+      gridRow: '3',
+    })
+    expect(hasAutoImageSplitOverflow({ position: 'center', size: 100 }, 1000, 500, 16, true)).toBe(true)
   })
 })

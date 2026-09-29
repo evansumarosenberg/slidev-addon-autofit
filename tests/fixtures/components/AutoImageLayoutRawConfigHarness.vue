@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import AutoImageLayout from '../../../layouts/auto-image.vue'
 
-type Position = 'left' | 'right' | 'top' | 'bottom'
+type Position = 'left' | 'right' | 'top' | 'bottom' | 'center'
 type Configuration = 'omitted' | 'default' | 'partial' | 'custom' | 'invalid'
 
 interface RawConfigCase {
@@ -33,6 +33,8 @@ const cases: readonly RawConfigCase[] = [
   { id: 'right-partial', position: 'right', configuration: 'partial', autofit: { alignment: 'bottom' } },
   { id: 'top-custom', position: 'top', configuration: 'custom', autofit: { largeTiers: 0, smallTiers: 0, tierIncrement: 10, alignment: 'center' } },
   { id: 'bottom-invalid', position: 'bottom', configuration: 'invalid', autofit: { largeTiers: 5, smallTiers: -1, tierIncrement: 10, alignment: 'top' } },
+  { id: 'center-custom', position: 'center', configuration: 'custom', autofit: { largeTiers: 0, smallTiers: 0, tierIncrement: 10, alignment: 'center' } },
+  { id: 'center-invalid', position: 'center', configuration: 'invalid', autofit: { largeTiers: 6, smallTiers: -1, tierIncrement: 10, alignment: 'top' } },
 ]
 
 const imageSource = '/images/autofit_placeholder.jpg'

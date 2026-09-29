@@ -135,7 +135,7 @@ The `image` object accepts these values:
 | `position` | `center` | `left`, `right`, `top`, `bottom`, or `center` |
 | `size` | `100%` | A percentage string from `0%` through `100%` |
 
-Omit `image` when using both defaults and include only properties that differ. Omit `autofit` when its defaults suffice; it applies only when a non-center position has an `::auto::` slot. `center` has no AutoFit region, so keep any text in the fixed default or footer slots. For other positions, omit `::auto::` if the slide has only images.
+Omit `image` when using both defaults and include only properties that differ. Omit `autofit` when its defaults suffice; it applies when an `::auto::` slot is declared. With `center`, the AutoFit region sits below the centered image area and above the fixed footer. Omit `::auto::` if the slide has only images.
 
 `size` is authoritative and is applied before the inter-region gap. For `left`, `right`, and `center`, it is a percentage of the remaining width; for `top` and `bottom`, it is a percentage of the remaining height. A declared `::auto::` reserves a gap, so `size: 100%` with `::auto::` can overflow.
 

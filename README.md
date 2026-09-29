@@ -72,8 +72,8 @@ the Markdown source does not change their placement.
 
 ## Auto-image layout
 
-Use `layout: auto-image` to place one or more managed images beside, above, or
-below an ordinary AutoFit region. The unnamed default slot remains fixed above
+Use `layout: auto-image` to place one or more managed images beside or above
+an ordinary AutoFit region. The unnamed default slot remains fixed above
 the remaining space, and `footer` remains fixed below it. Named-slot order in
 the Markdown source does not affect visual placement.
 
@@ -119,12 +119,14 @@ The `image` object accepts these values:
 | `size` | A percentage string from `0%` through `100%` | `100%` |
 
 `size` is authoritative and is applied before the inter-region gap. For
-`left`, `right`, and `center`, it is a percentage of the remaining width; for
-`top` and `bottom`, it is a percentage of the remaining height. The default
-region gap is `1rem`, taken from the AutoFit remainder and never silently
-shrunk. Managed images fit at the largest uncropped, aspect-preserving size,
-including when they must be upscaled. A caption is fixed content inside the
-image region and uses a separate `1rem` image-to-caption gap.
+`left` and `right`, it is a percentage of the remaining width; for `top` and
+`bottom`, it is a percentage of the remaining height. For `center`, it sets
+the image area's width and, when `auto` is declared, its height as percentages
+of the remaining stage. The default region gap is `1rem`, taken from the AutoFit
+remainder and never silently shrunk. Managed images fit at the largest
+uncropped, aspect-preserving size, including when they must be upscaled. A
+caption is fixed content inside the image region and uses a separate `1rem`
+image-to-caption gap.
 
 Each direct Markdown image, or Markdown paragraph containing only one image,
 starts an item. Its immediately following paragraph is its optional caption;
@@ -146,10 +148,10 @@ caption, loading, and failure behavior.
 
 AutoFit behavior depends on the position and slot contents:
 
-- `center` does not place AutoFit. Omitted or empty `auto` content is valid;
-  substantive content produces `AUTO IMAGE UNSUPPORTED`.
-- With a non-center position, an omitted `auto` slot reserves no gap. A
-  declared empty slot mounts AutoFit and reserves the gap.
+- With `center`, the image area is centered horizontally and AutoFit receives
+  the remaining space below it, above the fixed footer.
+- An omitted `auto` slot reserves no gap. A declared empty slot mounts AutoFit
+  and reserves the gap.
 - A `100%` image with no `auto` slot fills its allocation without split
   overflow. A declared `auto` slot still reserves the gap, so the layout can
   report split overflow rather than shrinking the image.

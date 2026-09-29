@@ -446,7 +446,6 @@ test('uses the fixed default shell and places named slots independently of sourc
     32 * computed.scale,
   )
   await expect(layout).not.toHaveClass(/auto-image-layout--split-overflow/)
-  await expect(layout.locator('.auto-image-layout__semantic-probe')).toHaveCount(0)
 
   await openSlide(page, 106, 'auto-image-right-main')
   const right = layoutFor(page, 'auto-image-right-main')
@@ -526,61 +525,63 @@ test('reacts to default, auto, and footer slot presence changes', async ({ page 
   await expect(restored.locator('.auto-image-layout__footer')).toHaveCount(1)
 })
 
-test('center has no AutoFit or gap and probes only a declared auto slot', async ({ page }) => {
-  const autofitWarnings: string[] = []
-  const centerWarnings: string[] = []
-  page.on('console', (message) => {
-    if (message.type() === 'warning' && message.text().includes('AUTOFIT CONFIGURATION'))
-      autofitWarnings.push(message.text())
-    if (message.type() === 'warning' && message.text().includes('center-with-auto-content'))
-      centerWarnings.push(message.text())
-  })
-
+test('center places AutoFit below the centered image and above the footer', async ({ page }) => {
   await openSlide(page, 105, 'auto-image-center')
   const omitted = layoutFor(page, 'auto-image-center')
+  const omittedMain = await box(omitted.locator('.auto-image-layout__main'))
   const stage = await box(omitted.locator('.auto-image-layout__stage'))
   const image = await box(omitted.locator('.auto-image-layout__image-track'))
+  const omittedScale = await omitted.locator('.auto-image-layout__stage').evaluate((element) => (
+    element.getBoundingClientRect().height / (element as HTMLElement).clientHeight
+  ))
   await expect(omitted.locator('.autofit')).toHaveCount(0)
-  await expect(omitted.locator('.auto-image-layout__semantic-probe')).toHaveCount(0)
+  closeTo(stage.y - (omittedMain.y + omittedMain.height), 10 * omittedScale)
   closeTo(image.width / stage.width * 100, 50)
   closeTo(image.x - stage.x, (stage.width - image.width) / 2)
+  closeTo(image.height, stage.height)
 
   await openSlide(page, 110, 'auto-image-center-content')
-  const substantive = layoutFor(page, 'auto-image-center-content')
-  const probe = substantive.locator('.auto-image-layout__semantic-probe')
-  await expect(probe).toHaveCount(1)
-  await expect(probe).toHaveAttribute('hidden', '')
-  await expect(probe).toHaveAttribute('inert', '')
-  await expect(probe).toHaveAttribute('aria-hidden', 'true')
-  await expect(substantive).toHaveClass(/auto-image-layout--unsupported/)
-  await expect(substantive).toHaveAttribute(
-    'data-auto-image-layout-unsupported-reason',
-    'center-with-auto-content',
-  )
-  await expect.poll(() => centerWarnings.length).toBe(1)
-  expect(centerWarnings[0]).toBe(
-    '[slidev-addon-autofit] AUTO IMAGE UNSUPPORTED (center-with-auto-content): center mode cannot place substantive AutoFit content.',
-  )
-  await expect(substantive.locator('.autofit')).toHaveCount(0)
-
-  await probe.evaluate((element) => element.replaceChildren())
-  await expect(substantive).not.toHaveClass(/auto-image-layout--unsupported/)
-  await expect(substantive).not.toHaveAttribute('data-auto-image-layout-unsupported-reason')
-
-  await probe.evaluate((element) => element.replaceChildren(
-    Object.assign(document.createElement('p'), { textContent: 'Re-entered center content' }),
+  const layout = layoutFor(page, 'auto-image-center-content')
+  const centerMain = await box(layout.locator('.auto-image-layout__main'))
+  const centerStage = await box(layout.locator('.auto-image-layout__stage'))
+  const centerImage = await box(layout.locator('.auto-image-layout__image-track'))
+  const autofit = layout.locator('.auto-image-layout__auto-track')
+  const centerAuto = await box(autofit)
+  const footer = await box(layout.locator('.auto-image-layout__footer'))
+  const scale = await layout.locator('.auto-image-layout__stage').evaluate((element) => (
+    element.getBoundingClientRect().height / (element as HTMLElement).clientHeight
   ))
-  await expect(substantive).toHaveClass(/auto-image-layout--unsupported/)
-  await expect.poll(() => centerWarnings.length).toBe(2)
-  await probe.evaluate((element) => element.replaceChildren())
-  await expect(substantive).not.toHaveClass(/auto-image-layout--unsupported/)
+  await expect(autofit).toHaveAttribute('data-autofit-state', 'fit')
+  await expect(layout).not.toHaveAttribute('data-auto-image-layout-unsupported-reason')
+  closeTo(centerStage.y - (centerMain.y + centerMain.height), 10 * scale)
+  closeTo(centerImage.width / centerStage.width * 100, 40)
+  closeTo(centerImage.height / centerStage.height * 100, 40)
+  closeTo(centerImage.x - centerStage.x, (centerStage.width - centerImage.width) / 2)
+  closeTo(centerAuto.x, centerStage.x)
+  closeTo(centerAuto.width, centerStage.width)
+  closeTo(centerAuto.y - (centerImage.y + centerImage.height), 32 * scale)
+  closeTo(centerAuto.y + centerAuto.height, footer.y)
+})
 
-  await openSlide(page, 116, 'auto-image-center-empty')
-  const empty = layoutFor(page, 'auto-image-center-empty')
-  await expect(empty.locator('.auto-image-layout__semantic-probe')).toHaveCount(1)
-  await expect(empty).not.toHaveClass(/auto-image-layout--unsupported/)
-  await expect(empty.locator('.autofit')).toHaveCount(0)
-  expect(autofitWarnings).toEqual([])
+test('center reports normal split and AutoFit overflow when the image consumes the stage', async ({ page }) => {
+  const overflowWarnings: string[] = []
+  page.on('console', (message) => {
+    if (message.type() === 'warning' && message.text().includes('AUTOFIT OVERFLOW'))
+      overflowWarnings.push(message.text())
+  })
+  await openSlide(page, 152, 'auto-image-layout-lifecycle-content')
+  const layout = layoutFor(page, 'auto-image-layout-lifecycle-content')
+  await page.getByTestId('auto-image-layout-set-center').click()
+  await expect(layout.locator('.autofit')).toHaveAttribute('data-autofit-state', 'fit')
+  await page.getByTestId('auto-image-layout-set-auto-overflow').click()
+  await expect(layout).not.toHaveAttribute('data-auto-image-layout-overflow')
+  await expect(layout.locator('.autofit')).toHaveAttribute('data-autofit-state', 'overflow')
+  await expect.poll(() => overflowWarnings.length).toBeGreaterThan(0)
+  await page.getByTestId('auto-image-layout-set-full').click()
+  await expect(layout).toHaveAttribute('data-auto-image-layout-overflow-reason', 'region-gap')
+  await expect(layout.locator('.autofit')).toHaveAttribute('data-autofit-state', 'overflow')
+  await expect(layout.locator('.autofit__overflow-badge')).toHaveText('AUTOFIT OVERFLOW')
+  await expect(layout).not.toHaveAttribute('data-auto-image-layout-unsupported-reason')
 })
 
 test('explicitly empty auto mounts the existing bridge and reserves the region gap', async ({ page }) => {
@@ -589,7 +590,6 @@ test('explicitly empty auto mounts the existing bridge and reserves the region g
   const autofit = layout.locator(':scope > .auto-image-layout__stage > .autofit')
   await expect(autofit).toHaveAttribute('data-autofit-empty', 'true')
   await expect(autofit).toHaveAttribute('data-autofit-state', 'fit')
-  await expect(layout.locator('.auto-image-layout__semantic-probe')).toHaveCount(0)
 })
 
 test('invalid image configuration is atomic and leaves only fixed content visible', async ({ page }) => {
@@ -609,7 +609,6 @@ test('invalid image configuration is atomic and leaves only fixed content visibl
   await expect(layout.locator('.auto-image-layout__config-error-badge')).toHaveText('AUTO IMAGE CONFIGURATION ERROR')
   await expect(layout.locator('.auto-image')).toHaveCount(0)
   await expect(layout.locator('.autofit')).toHaveCount(0)
-  await expect(layout.locator('.auto-image-layout__semantic-probe')).toHaveCount(0)
   await expect(layout.getByTestId('auto-image-invalid-footer')).toBeVisible()
   await expect.poll(() => warnings.length).toBe(1)
   expect(warnings[0]).toContain('[slidev-addon-autofit]')
@@ -1078,13 +1077,6 @@ test('fixed main/footer overflow takes visual precedence without clearing inner 
       badge: '.auto-image-layout__overflow-badge',
     },
     {
-      slide: 156,
-      marker: 'auto-image-fixed-center-precedence',
-      innerClass: 'auto-image-layout--unsupported',
-      innerAttribute: ['data-auto-image-layout-unsupported-reason', 'center-with-auto-content'],
-      badge: '.auto-image-layout__unsupported-badge',
-    },
-    {
       slide: 157,
       marker: 'auto-image-fixed-inner-precedence',
       innerClass: 'auto-image-layout--overflow',
@@ -1234,76 +1226,26 @@ test('keeps fixed overflow diagnostics visible while suppressing inner diagnosti
   await expect.poll(() => warnings.filter(message => message.includes('AUTOFIT OVERFLOW')).length).toBeGreaterThan(0)
 })
 
-const centerProbeCases = [
-  { slide: 105, marker: 'auto-image-center', substantive: false, declared: false },
-  { slide: 119, marker: 'auto-image-center-whitespace', substantive: false, declared: true },
-  { slide: 120, marker: 'auto-image-center-comment', substantive: false, declared: true },
-  { slide: 121, marker: 'auto-image-center-sentinel', substantive: false, declared: true },
-  { slide: 122, marker: 'auto-image-center-component-empty', substantive: false, declared: true },
-  { slide: 123, marker: 'auto-image-center-reveal-hidden', substantive: true, declared: true },
-  { slide: 124, marker: 'auto-image-center-visible', substantive: true, declared: true },
-] as const
-
-for (const fixture of centerProbeCases) {
-  test(`classifies center probe: ${fixture.marker}`, async ({ page }) => {
+test('center mounts the normal AutoFit bridge for declared content', async ({ page }) => {
+  for (const fixture of [
+    { slide: 119, marker: 'auto-image-center-whitespace' },
+    { slide: 120, marker: 'auto-image-center-comment' },
+    { slide: 121, marker: 'auto-image-center-sentinel' },
+    { slide: 122, marker: 'auto-image-center-component-empty' },
+    { slide: 123, marker: 'auto-image-center-reveal-hidden' },
+    { slide: 124, marker: 'auto-image-center-visible' },
+  ] as const) {
     await openSlide(page, fixture.slide, fixture.marker)
     const layout = layoutFor(page, fixture.marker)
-    const probe = layout.locator('.auto-image-layout__semantic-probe')
-    await expect(probe).toHaveCount(fixture.declared ? 1 : 0)
-    await expect(layout.locator('.autofit')).toHaveCount(0)
-    if (!fixture.declared)
-      return
-
-    await expect(probe).toHaveAttribute('hidden', '')
-    await expect(probe).toHaveAttribute('inert', '')
-    await expect(probe).toHaveAttribute('aria-hidden', 'true')
-    const metrics = await probe.evaluate((element) => {
-      const node = element as HTMLElement
-      const style = getComputedStyle(node)
-      return {
-        rect: node.getBoundingClientRect().toJSON(),
-        clientWidth: node.clientWidth,
-        clientHeight: node.clientHeight,
-        display: style.display,
-        opacity: style.opacity,
-      }
-    })
-    expect(metrics.rect.width).toBe(0)
-    expect(metrics.rect.height).toBe(0)
-    expect(metrics.clientWidth).toBe(0)
-    expect(metrics.clientHeight).toBe(0)
-    expect(metrics.display).toBe('none')
-    expect(metrics.opacity).toBe('1')
-    await expect(layout).toHaveClass(fixture.substantive
-      ? /auto-image-layout--unsupported/
-      : /auto-image-layout(?!--unsupported)/)
-  })
-}
-
-test('reclassifies a declared center probe from empty to substantive and back', async ({ page }) => {
-  await openSlide(page, 145, 'auto-image-center-live')
-  const layout = layoutFor(page, 'auto-image-center-live')
-  const probe = layout.locator('.auto-image-layout__semantic-probe')
-  await expect(layout).not.toHaveClass(/auto-image-layout--unsupported/)
-
-  await probe.evaluate((element) => {
-    element.replaceChildren(Object.assign(document.createElement('p'), {
-      textContent: 'Live substantive content',
-    }))
-  })
-  await expect(layout).toHaveClass(/auto-image-layout--unsupported/)
-  await expect(layout).toHaveAttribute(
-    'data-auto-image-layout-unsupported-reason',
-    'center-with-auto-content',
-  )
-
-  await probe.evaluate((element) => element.replaceChildren(document.createComment('empty again')))
-  await expect(layout).not.toHaveClass(/auto-image-layout--unsupported/)
-  await expect(layout).not.toHaveAttribute('data-auto-image-layout-unsupported-reason')
-  await expect(probe).toHaveCSS('display', 'none')
+    const autofit = layout.locator('.auto-image-layout__auto-track')
+    await expect(autofit).toHaveCount(1)
+    await expect(layout).not.toHaveAttribute('data-auto-image-layout-unsupported-reason')
+  }
+  const invalid = layoutFor(page, 'auto-image-center-visible').locator('.autofit')
+  await expect(invalid).toHaveAttribute('data-autofit-config-error', 'invalid-small-tiers')
 })
 
-test('forwards raw AutoFit configuration across every non-center position', async ({ page }) => {
+test('forwards raw AutoFit configuration across every position', async ({ page }) => {
   const cases = [
     ['left', 'omitted', 'distributed', 'distributed', '4', '1.4', false, 'undefined:undefined'],
     ['right', 'default', 'distributed', 'distributed', '4', '1.4', false, '[object Object]{}'],
@@ -1325,6 +1267,8 @@ test('forwards raw AutoFit configuration across every non-center position', asyn
     ['right', 'partial', 'bottom', 'bottom', '4', '1.4', false, '[object Object]{alignment:string:bottom}'],
     ['top', 'custom', 'center', 'middle', '0', '1', false, '[object Object]{alignment:string:center,largeTiers:number:0,smallTiers:number:0,tierIncrement:number:10}'],
     ['bottom', 'invalid', 'distributed', 'distributed', '4', '1.4', true, '[object Object]{alignment:string:top,largeTiers:number:5,smallTiers:number:-1,tierIncrement:number:10}'],
+    ['center', 'custom', 'center', 'middle', '0', '1', false, '[object Object]{alignment:string:center,largeTiers:number:0,smallTiers:number:0,tierIncrement:number:10}'],
+    ['center', 'invalid', 'distributed', 'distributed', '4', '1.4', true, '[object Object]{alignment:string:top,largeTiers:number:6,smallTiers:number:-1,tierIncrement:number:10}'],
   ] as const
 
   await openSlide(page, AUTO_IMAGE_RAW_CONFIG_HARNESS_SLIDE, 'auto-image-layout-raw-config-harness')
@@ -1349,6 +1293,7 @@ test('forwards raw AutoFit configuration across every non-center position', asyn
       const marker = harness.getByTestId('auto-image-layout-raw-config-case-marker')
       await expect(marker).toHaveAttribute('data-auto-image-layout-raw-config-case', `${position}-${configuration}`)
       const autofit = layoutFor(page, 'auto-image-layout-raw-config-case-marker').locator('.autofit')
+      await expect(autofit).toHaveAttribute('data-autofit-state', /^(fit|overflow|unsupported|config-error)$/, { timeout: 15_000 })
       await waitForAutofitPublication(autofit)
       await expect(autofit).toHaveAttribute('data-autofit-requested-alignment', requested)
       await expect(autofit).toHaveAttribute('data-autofit-effective-alignment', effective)

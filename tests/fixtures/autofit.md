@@ -2160,6 +2160,10 @@ image:
 
 <p data-testid="center-auto-content">Substantive center auto content</p>
 
+::footer::
+
+<p data-testid="center-footer-content">Fixed center footer</p>
+
 ---
 layout: auto-image
 image:
@@ -2817,7 +2821,7 @@ image:
   size: 50%
 ---
 
-<div data-testid="auto-image-center-live">Live center probe</div>
+<div data-testid="auto-image-center-live">Live center AutoFit</div>
 
 ::image::
 
@@ -2825,7 +2829,7 @@ image:
 
 ::auto::
 
-<!-- empty before browser mutation -->
+<!-- semantically empty AutoFit content -->
 
 ---
 layout: auto-default

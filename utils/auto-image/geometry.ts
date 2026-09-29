@@ -119,28 +119,37 @@ export function calculateAutoImageSplitGeometry(
   const imageAxisSize = availableAxisSize * input.imagePercentage / 100
 
   if (input.position === 'center') {
-    const blankSide = (input.availableInlineSize - imageAxisSize) / 2
+    const imageInlineSize = imageAxisSize
+    const blankSide = (input.availableInlineSize - imageInlineSize) / 2
+    const imageBlockSize = input.autoDeclared
+      ? input.availableBlockSize * input.imagePercentage / 100
+      : input.availableBlockSize
+    const gapSize = input.autoDeclared ? input.regionGap : 0
+    const autoBlockSize = input.autoDeclared
+      ? Math.max(0, input.availableBlockSize - imageBlockSize - gapSize)
+      : 0
     return {
       position: input.position,
-      axis,
+      axis: input.autoDeclared ? 'block' : axis,
       order,
       imagePercentage: input.imagePercentage,
-      imageAxisSize,
-      autoAxisSize: 0,
-      gapSize: 0,
-      splitOverflow: false,
-      imageAxisOffset: blankSide,
-      autoAxisOffset: 0,
+      imageAxisSize: input.autoDeclared ? imageBlockSize : imageAxisSize,
+      autoAxisSize: autoBlockSize,
+      gapSize,
+      splitOverflow: input.autoDeclared
+        && input.availableBlockSize - imageBlockSize < gapSize,
+      imageAxisOffset: input.autoDeclared ? 0 : blankSide,
+      autoAxisOffset: input.autoDeclared ? imageBlockSize + gapSize : 0,
       blankBefore: blankSide,
       blankAfter: blankSide,
-      imageInlineSize: imageAxisSize,
-      imageBlockSize: input.availableBlockSize,
-      autoInlineSize: 0,
-      autoBlockSize: 0,
+      imageInlineSize,
+      imageBlockSize,
+      autoInlineSize: input.autoDeclared ? input.availableInlineSize : 0,
+      autoBlockSize,
       imageInlineOffset: blankSide,
       imageBlockOffset: 0,
       autoInlineOffset: 0,
-      autoBlockOffset: 0,
+      autoBlockOffset: input.autoDeclared ? imageBlockSize + gapSize : 0,
     }
   }
 

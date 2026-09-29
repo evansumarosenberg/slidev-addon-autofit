@@ -79,7 +79,9 @@ export function createAutoImageStageStyle(
   if (config.position === 'center') {
     return {
       gridTemplateColumns: `minmax(0, 1fr) ${imageSize} minmax(0, 1fr)`,
-      gridTemplateRows: 'minmax(0, 1fr)',
+      gridTemplateRows: autoDeclared
+        ? `${imageSize} ${REGION_GAP} ${remainderTrack(imageSize)}`
+        : 'minmax(0, 1fr)',
     }
   }
 
@@ -124,6 +126,8 @@ export function createAutoImageImageTrackStyle(
 export function createAutoImageAutoTrackStyle(
   config: AutoImageConfig,
 ): AutoImageLayoutStyle {
+  if (config.position === 'center')
+    return { gridColumn: '1 / -1', gridRow: '3' }
   if (config.position === 'top')
     return { gridColumn: '1', gridRow: '3' }
   if (config.position === 'bottom')
@@ -169,10 +173,10 @@ export function hasAutoImageSplitOverflow(
   regionGap: number,
   autoDeclared: boolean,
 ): boolean {
-  if (!autoDeclared || config.position === 'center')
+  if (!autoDeclared)
     return false
 
-  const availableAxisSize = config.position === 'top' || config.position === 'bottom'
+  const availableAxisSize = config.position === 'top' || config.position === 'bottom' || config.position === 'center'
     ? availableBlockSize
     : availableInlineSize
   const imageAxisSize = availableAxisSize * (config.size / 100)
