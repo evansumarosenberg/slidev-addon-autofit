@@ -1,5 +1,6 @@
 import { AUTOFIT_UNSUPPORTED_REASON_PRECEDENCE } from './types'
 import { readAutofitDisplayMathBlock } from './display-math'
+import { readAutofitInlineMath } from './inline-math'
 import type {
   AutofitClassification,
   AutofitGapKind,
@@ -506,6 +507,12 @@ export function classifyAutofitContent(
   const classification = new ClassificationBuilder().classify(flowRoot)
   if (!options.displayMath)
     return classification
+  // The layout math gate also enables inline geometry, independently of whether
+  // this flow contains any display blocks. Direct AutoFit keeps its legacy path.
+  const inlineMath = [...flowRoot.querySelectorAll('span.katex')].flatMap(root => {
+    const math = readAutofitInlineMath(root)
+    return math ? [math] : []
+  })
   const blocks = classification.units
     .filter(unit => unit.kind === 'atomic')
     .flatMap(unit => {
@@ -513,7 +520,7 @@ export function classifyAutofitContent(
       return block ? [block] : []
     })
   if (blocks.length === 0)
-    return classification
+    return inlineMath.length ? { ...classification, inlineMath } : classification
   // Keep the existing semantic unit/carrier and boundary objects. Only its
   // visual edge and the known external math margins need special ownership.
   const visualRoots = new Map(blocks.map(block => [block.root, block.visual]))
@@ -525,6 +532,7 @@ export function classifyAutofitContent(
   })
   return {
     ...classification,
+    ...(inlineMath.length ? { inlineMath } : {}),
     displayMathBlocks: blocks,
     marginResetElements: [...classification.marginResetElements,
       ...blocks.flatMap(block => [block.paragraph, block.display])],

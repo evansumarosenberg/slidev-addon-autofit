@@ -121,6 +121,7 @@ interface AutofitTestHooks {
 }
 
 export interface AutofitClassificationSignature {
+  readonly inlineMathElements?: readonly Element[]
   readonly displayMathElements?: readonly Element[]
   readonly units: readonly {
     readonly kind: string
@@ -709,6 +710,10 @@ export function createAutofitClassificationSignature(
   classification: AutofitClassification,
 ): AutofitClassificationSignature {
   return {
+    ...(classification.inlineMath ? {
+      inlineMathElements: classification.inlineMath.flatMap(math =>
+        [math.root, math.visual, ...math.visual.children]),
+    } : {}),
     ...(classification.displayMathBlocks ? {
       displayMathElements: classification.displayMathBlocks.flatMap(block =>
         [block.root, block.paragraph, block.display, block.katex, block.visual]),
@@ -729,7 +734,7 @@ export function isAutofitPresentationCompatible(
   presentation: AutofitStaticPresentation,
 ): boolean {
   if (
-    !sameDisplayMathElements(signature, presentation.signature)
+    !sameMathElements(signature, presentation.signature)
     || signature.units.length !== presentation.signature.units.length
     || signature.boundaries.length !== presentation.signature.boundaries.length
   ) {
@@ -753,7 +758,7 @@ export function areAutofitClassificationSignaturesEqual(
   left: AutofitClassificationSignature,
   right: AutofitClassificationSignature,
 ): boolean {
-  return sameDisplayMathElements(left, right)
+  return sameMathElements(left, right)
     && left.units.length === right.units.length
     && left.boundaries.length === right.boundaries.length
     && left.units.every((unit, index) => {
@@ -772,12 +777,12 @@ export function areAutofitClassificationSignaturesEqual(
     })
 }
 
-function sameDisplayMathElements(
+function sameMathElements(
   left: AutofitClassificationSignature,
   right: AutofitClassificationSignature,
 ): boolean {
-  const elements = left.displayMathElements ?? []
-  const other = right.displayMathElements ?? []
+  const elements = [...left.displayMathElements ?? [], ...left.inlineMathElements ?? []]
+  const other = [...right.displayMathElements ?? [], ...right.inlineMathElements ?? []]
   return elements.length === other.length
     && elements.every((element, index) => element === other[index] && element.isConnected)
 }

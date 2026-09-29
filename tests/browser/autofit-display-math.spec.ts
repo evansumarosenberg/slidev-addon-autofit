@@ -120,6 +120,65 @@ test('genuinely wide math still reports overflow', async ({ page }) => {
   await expect(root.locator('.katex-display')).toBeVisible()
 })
 
+for (const marker of ['math-inline-radical', 'math-inline-radical-mixed', 'math-inline-radical-wrapped']) {
+  test(`${marker}: ignores clipped inline construction paths and preserves paragraph fitting`, async ({ page }) => {
+    const layout = await mathSlide(page, marker)
+    for (const root of await layout.locator('.autofit').all()) {
+      await waitForAutofitPublication(root)
+      await expect(root).toHaveAttribute('data-autofit-state', 'fit')
+      await expect(root).toHaveAttribute('data-autofit-effective-alignment', 'distributed')
+      await expect(root.locator('.autofit__overflow-badge')).toHaveCount(0)
+      const metrics = await root.evaluate(element => {
+        const viewport = element.querySelector('.autofit__viewport')!
+        const bounds = viewport.getBoundingClientRect()
+        const scale = bounds.width / Number.parseFloat(getComputedStyle(viewport).width)
+        const inline = [...element.querySelectorAll('.katex')].filter(math => !math.closest('.katex-display'))
+        return {
+          hasClippedOversizedPath: inline.some(math => [...math.querySelectorAll('svg path')]
+            .some(path => path.getBoundingClientRect().right > bounds.right + scale)),
+          visualFits: inline.every(math => [...math.querySelector('.katex-html')!.children].every(line => {
+            const rect = line.getBoundingClientRect()
+            return rect.left >= bounds.left - scale * 0.5 && rect.right <= bounds.right + scale * 0.5
+              && rect.top >= bounds.top - scale * 0.5 && rect.bottom <= bounds.bottom + scale * 0.5
+          })),
+        }
+      })
+      expect(metrics).toEqual({ hasClippedOversizedPath: true, visualFits: true })
+      if (marker.endsWith('wrapped')) {
+        expect(await root.locator('.autofit__flow > p').first().evaluate(element =>
+          element.getBoundingClientRect().height / Number.parseFloat(getComputedStyle(element).lineHeight)))
+          .toBeGreaterThan(2)
+      }
+    }
+  })
+}
+
+test('inline formula replacement and resize retain correct fitting', async ({ page }) => {
+  const layout = await mathSlide(page, 'math-inline-radical')
+  const root = layout.locator('.autofit')
+  await waitForAutofitPublication(root)
+  const batch = Number(await root.getAttribute('data-autofit-batch-id'))
+  await root.locator('.katex-html').first().evaluate(element => element.replaceWith(element.cloneNode(true)))
+  await waitForNewAutofitPublication(root, batch)
+  await expect(root).toHaveAttribute('data-autofit-state', 'fit')
+  await page.setViewportSize({ width: 1000, height: 700 })
+  await waitForAutofitPublication(root)
+  await expect(root).toHaveAttribute('data-autofit-state', 'fit')
+  await expect(root).toHaveAttribute('data-autofit-effective-alignment', 'distributed')
+})
+
+test('genuinely wide inline radicals still report overflow', async ({ page }) => {
+  const layout = await mathSlide(page, 'math-inline-radical-wide')
+  const root = layout.locator('.autofit')
+  await waitForAutofitPublication(root)
+  await expect(root).toHaveAttribute('data-autofit-state', 'overflow')
+  expect(await root.evaluate(element => {
+    const viewport = element.querySelector('.autofit__viewport')!.getBoundingClientRect()
+    return [...element.querySelectorAll('.katex-html > *')]
+      .some(line => line.getBoundingClientRect().right > viewport.right + 1)
+  })).toBe(true)
+})
+
 test('direct AutoFit retains its existing typography path', async ({ page }) => {
   const layout = await mathSlide(page, 'math-direct')
   const root = layout.locator('.autofit')

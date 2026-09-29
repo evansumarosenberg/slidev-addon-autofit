@@ -379,6 +379,28 @@ $$
 
 ---
 
+# LaTeX: inline and blocks
+
+::auto::
+
+Quaternions can be composed through multiplication:
+
+$$\mathbf q_1\mathbf q_2=(s_1s_2-\mathbf v_1\cdot\mathbf v_2,\;s_1\mathbf v_2+s_2\mathbf v_1+\mathbf v_1\times\mathbf v_2)$$
+
+Magnitude: $|\mathbf q|=\sqrt{s^2+\mathbf v\cdot\mathbf v}$
+
+Inverse: $\mathbf q^{-1}=\frac{1}{|\mathbf q|^2}(s,-\mathbf v)$
+
+For rotations we assume unit quaternions, hence:
+
+$$\mathbf q^{-1}=(s,-\mathbf v)\qquad\text{when }|\mathbf q|=1$$
+
+::footer::
+
+Quaternion multiplication is **not** commutative!
+
+---
+
 # LaTeX blocks with reveal
 
 ::auto::

@@ -1,4 +1,5 @@
 import { displayMathGeometryElements } from './display-math'
+import { inlineMathGeometryElements } from './inline-math'
 import type {
   AutofitClassification,
   AutofitComputedBoxStyle,
@@ -373,6 +374,16 @@ function calculateBounds(
   const ownedTextFormattingElements
     = deriveOwnedTextFormattingElements(classification)
   const mathInternals = new Set<Element>()
+  const inlineMathBoxes = new Set<Element>()
+  for (const math of classification.inlineMath ?? []) {
+    const measured = new Set(inlineMathGeometryElements(math))
+    for (const element of measured)
+      inlineMathBoxes.add(element)
+    for (const descendant of math.root.querySelectorAll('*')) {
+      if (!measured.has(descendant))
+        mathInternals.add(descendant)
+    }
+  }
   for (const block of classification.displayMathBlocks ?? []) {
     const measured = new Set(displayMathGeometryElements(block))
     for (const descendant of block.root.querySelectorAll('*')) {
@@ -394,6 +405,7 @@ function calculateBounds(
 
     if (
       ownedTextFormattingElements.has(descendant)
+      && !inlineMathBoxes.has(descendant)
       && isGeometryTransparentInlineFormatting(
         descendant,
         reads.readComputedStyle(descendant),

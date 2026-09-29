@@ -310,3 +310,71 @@ Fourth short paragraph.
 A width-constrained word.
 
 ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+
+---
+layout: auto-default
+---
+
+# Inline radicals and fractions
+
+<span data-testid="math-inline-radical" />
+
+::auto::
+
+Length: $\sqrt{x^2+y^2}$ is measured within its paragraph.
+
+- Reciprocal: $\frac{1}{\sqrt{x^2+y^2}}$ stays inside the list item.
+- Nested radical: $\sqrt{1+\sqrt{1+x^2}}$ remains inline.
+
+---
+layout: auto-default
+---
+
+# Inline radicals with display equations
+
+<span data-testid="math-inline-radical-mixed" />
+
+::auto::
+
+Length: $\sqrt{x^2+y^2}$.
+
+$$
+r^2=x^2+y^2
+$$
+
+Reciprocal: $\frac{1}{\sqrt{x^2+y^2}}$.
+
+---
+layout: auto-column
+autofit:
+  smallTiers: 0
+  largeTiers: 0
+---
+
+# Wrapped inline math
+
+<span data-testid="math-inline-radical-wrapped" />
+
+::left::
+
+The length $\sqrt{x^2+y^2}$ belongs to this sentence, which continues with enough surrounding text to wrap naturally across several lines in the available column.
+
+Another paragraph after the wrapped formula.
+
+::right::
+
+The reciprocal $\frac{1}{\sqrt{x^2+y^2}}$ belongs to this sentence, which also continues with enough surrounding text to wrap naturally across several lines in the available column.
+
+Another paragraph after the wrapped formula.
+
+---
+layout: auto-default
+---
+
+# Genuine inline math overflow
+
+<span data-testid="math-inline-radical-wide" />
+
+::auto::
+
+An oversized formula: $\sqrt{\rule{120em}{1em}}$.

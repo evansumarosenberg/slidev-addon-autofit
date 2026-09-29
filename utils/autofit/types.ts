@@ -1,4 +1,5 @@
 import type { AutofitDisplayMathBlock } from './display-math'
+import type { AutofitInlineMath } from './inline-math'
 
 export type AutofitRequestedAlignment =
   | 'top'
@@ -330,6 +331,8 @@ export interface AutofitVisualClassification {
 }
 
 export interface AutofitClassification {
+  /** Geometry-only recognition in managed layouts; inline semantics stay unchanged. */
+  readonly inlineMath?: readonly AutofitInlineMath[]
   /** Present only for managed-layout display math. */
   readonly displayMathBlocks?: readonly AutofitDisplayMathBlock[]
   readonly units: readonly AutofitSemanticUnit[]
