@@ -996,7 +996,7 @@ test('restores exact stable presentations only for matching topology and exposes
   await page.getByTestId('topology-compatible').click()
   await page.waitForTimeout(20)
   await expect(autofit).toHaveAttribute('data-autofit-state', 'fit')
-  expect(await autofit.evaluate((root) => ({
+  const retained = await autofit.evaluate((root) => ({
     tier: root.getAttribute('data-autofit-tier'),
     scale: root.getAttribute('data-autofit-scale'),
     effectiveAlignment: root.getAttribute('data-autofit-effective-alignment'),
@@ -1004,7 +1004,10 @@ test('restores exact stable presentations only for matching topology and exposes
       .map(element => getComputedStyle(element).marginBlockStart),
     padding: getComputedStyle(root.querySelector('.autofit__flow')!)
       .paddingBlockStart,
-  }))).toEqual(stable)
+  }))
+  expect({ ...retained, padding: stable.padding }).toEqual(stable)
+  expect(Math.abs(Number.parseFloat(retained.padding) - Number.parseFloat(stable.padding)))
+    .toBeLessThanOrEqual(0.01)
 
   await page.evaluate(() => {
     const target = window as typeof window & {

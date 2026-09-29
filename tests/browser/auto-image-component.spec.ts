@@ -847,7 +847,7 @@ test('publishes and recovers every multi-item geometry overflow reason', async (
     ['200px', '200px', 'nowrap', 'caption-inline-overflow'],
     ['200px', '50px', 'long', 'caption-block-overflow'],
     ['200px', '8px', 'empty-first', 'no-image-block-space'],
-    ['21px', '200px', 'none', 'no-renderable-image-size'],
+    ['33px', '200px', 'none', 'no-renderable-image-size'],
   ] as const) {
     await test.step(reason, async () => {
       const before = await measureCount(root)
@@ -1207,6 +1207,7 @@ test('publishes exact default custom properties and derives caption color in lig
     const style = getComputedStyle(element)
     return {
       regionGap: style.getPropertyValue('--slidev-auto-image-region-gap').trim(),
+      itemGap: style.getPropertyValue('--slidev-auto-image-item-gap').trim(),
       captionGap: style.getPropertyValue('--slidev-auto-image-caption-gap').trim(),
       captionFontSize: style.getPropertyValue('--slidev-auto-image-caption-font-size').trim(),
       captionLineHeight: style.getPropertyValue('--slidev-auto-image-caption-line-height').trim(),
@@ -1214,7 +1215,8 @@ test('publishes exact default custom properties and derives caption color in lig
     }
   })
   expect(properties).toMatchObject({
-    regionGap: '1rem',
+    regionGap: '2rem',
+    itemGap: '2rem',
     captionGap: '0.5rem',
     captionFontSize: '0.875rem',
     captionLineHeight: '1.25rem',

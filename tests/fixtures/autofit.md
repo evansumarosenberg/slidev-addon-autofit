@@ -238,31 +238,31 @@ autofit:
 # Every default tier
 
 <div style="display: grid; grid-template-columns: repeat(3, 180px); gap: 8px">
-  <AutoFit data-testid="tier-4" style="width: 180px; height: 160px" alignment="top">
+  <AutoFit data-testid="tier-4" style="width: 180px; height: 170px" alignment="top">
     <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
   </AutoFit>
-  <AutoFit data-testid="tier-3" style="width: 180px; height: 144px" alignment="top">
+  <AutoFit data-testid="tier-3" style="width: 180px; height: 154px" alignment="top">
     <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
   </AutoFit>
-  <AutoFit data-testid="tier-2" style="width: 180px; height: 134px" alignment="top">
+  <AutoFit data-testid="tier-2" style="width: 180px; height: 144px" alignment="top">
     <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
   </AutoFit>
-  <AutoFit data-testid="tier-1" style="width: 180px; height: 123px" alignment="top">
+  <AutoFit data-testid="tier-1" style="width: 180px; height: 133px" alignment="top">
     <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
   </AutoFit>
-  <AutoFit data-testid="tier-0" style="width: 180px; height: 112px" alignment="top">
+  <AutoFit data-testid="tier-0" style="width: 180px; height: 122px" alignment="top">
     <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
   </AutoFit>
-  <AutoFit data-testid="tier--1" style="width: 180px; height: 102px" alignment="top">
+  <AutoFit data-testid="tier--1" style="width: 180px; height: 112px" alignment="top">
     <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
   </AutoFit>
-  <AutoFit data-testid="tier--2" style="width: 180px; height: 91px" alignment="top">
+  <AutoFit data-testid="tier--2" style="width: 180px; height: 101px" alignment="top">
     <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
   </AutoFit>
-  <AutoFit data-testid="tier--3" style="width: 180px; height: 80px" alignment="top">
+  <AutoFit data-testid="tier--3" style="width: 180px; height: 90px" alignment="top">
     <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
   </AutoFit>
-  <AutoFit data-testid="tier--4" style="width: 180px; height: 70px" alignment="top">
+  <AutoFit data-testid="tier--4" style="width: 180px; height: 80px" alignment="top">
     <p style="font-size: 100px; line-height: 100px; white-space: nowrap">I</p>
   </AutoFit>
 </div>

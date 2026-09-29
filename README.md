@@ -160,9 +160,9 @@ The layout and caption spacing can be overridden for a presentation with CSS:
 
 ```css
 :root {
-  --slidev-auto-image-region-gap: 1rem;
-  --slidev-auto-image-caption-gap: 1rem;
-  --slidev-auto-image-item-gap: 1rem;
+  --slidev-auto-image-region-gap: 2rem;
+  --slidev-auto-image-caption-gap: 0.5rem;
+  --slidev-auto-image-item-gap: 2rem;
   --slidev-auto-image-caption-font-size: 0.875rem;
   --slidev-auto-image-caption-line-height: 1.25rem;
   --slidev-auto-image-caption-color: color-mix(in srgb, var(--slide-foreground) 70%, transparent);
@@ -170,8 +170,8 @@ The layout and caption spacing can be overridden for a presentation with CSS:
 ```
 
 `--slidev-auto-image-item-gap` separates items in a multiple-image group. It
-defaults to `1rem` and can be increased, but its resolved value never falls
-below `1rem`. It is independent of the region and image-to-caption gaps.
+defaults to `2rem`; values below `1rem` are clamped to `1rem`. It is independent
+of the region and image-to-caption gaps.
 
 Auto-image diagnostics include `AUTO IMAGE CONFIGURATION ERROR` for invalid
 frontmatter, `AUTO IMAGE LAYOUT OVERFLOW` when the authoritative image size and

@@ -56,9 +56,9 @@ function closeTo(actual: number, expected: number) {
   expect(Math.abs(actual - expected)).toBeLessThanOrEqual(EPSILON)
 }
 
-function expectRectClose(actual: Rect, expected: Rect) {
+function expectRectClose(actual: Rect, expected: Rect, context = 'rectangle') {
   for (const key of RECT_KEYS)
-    closeTo(actual[key], expected[key])
+    expect(Math.abs(actual[key] - expected[key]), `${context} ${key}`).toBeLessThanOrEqual(EPSILON)
 }
 
 async function shellMetrics(layout: Locator, remainingSelector: string) {
@@ -237,8 +237,17 @@ async function cleanupAutoImageRevealProbe(page: Page): Promise<void> {
 }
 
 async function waitForAutoImageRevealSettled(page: Page): Promise<void> {
+  await waitForAutoImageRevealFrames(page, 2)
   await expect.poll(() => page.locator('.auto-image-reveal-harness .auto-image').evaluateAll(roots =>
-    roots.length === 11 && roots.every(root => root.getAttribute('data-auto-image-state') === 'fit'),
+    roots.length === 11 && roots.every((root) => {
+      if (root.getAttribute('data-auto-image-state') !== 'fit')
+        return false
+      return [...root.querySelectorAll<HTMLElement>('.auto-image__managed-caption')].every((caption) => {
+        const target = Number.parseFloat(caption.style.getPropertyValue('--slidev-auto-image-caption-block-offset'))
+        const current = Number.parseFloat(getComputedStyle(caption).insetBlockStart)
+        return Number.isFinite(target) && Number.isFinite(current) && Math.abs(target - current) <= 0.5
+      })
+    }),
   )).toBe(true)
 }
 
@@ -422,11 +431,11 @@ test('uses the fixed default shell and places named slots independently of sourc
 
   closeTo(imageTrack.x, stage.x)
   closeTo(imageTrack.width / stage.width * 100, 35)
-  closeTo(autofit.x - (imageTrack.x + imageTrack.width), 16 * computed.scale)
-  closeTo(autofit.width, stage.width - imageTrack.width - 16 * computed.scale)
+  closeTo(autofit.x - (imageTrack.x + imageTrack.width), 32 * computed.scale)
+  closeTo(autofit.width, stage.width - imageTrack.width - 32 * computed.scale)
   closeTo(footer.y + footer.height, stage.y + stage.height + footer.height)
-  expect(computed.gap).toBe('1rem')
-  expect(computed.columns).toContain('16px')
+  expect(computed.gap).toBe('2rem')
+  expect(computed.columns).toContain('32px')
 
   await layout.locator('.auto-image-layout__stage').evaluate((element) => {
     element.style.setProperty('--slidev-auto-image-region-gap', '2rem')
@@ -448,7 +457,7 @@ test('uses the fixed default shell and places named slots independently of sourc
     element.getBoundingClientRect().width / (element as HTMLElement).clientWidth
   ))
   closeTo(rightImage.x + rightImage.width, rightStage.x + rightStage.width)
-  closeTo(rightImage.x - (rightAuto.x + rightAuto.width), 16 * rightScale)
+  closeTo(rightImage.x - (rightAuto.x + rightAuto.width), 32 * rightScale)
 })
 
 test('uses block allocation for top and bottom positions', async ({ page }) => {
@@ -461,9 +470,9 @@ test('uses block allocation for top and bottom positions', async ({ page }) => {
   const topScale = await top.locator('.auto-image-layout__stage').evaluate((element) => (
     element.getBoundingClientRect().height / (element as HTMLElement).clientHeight
   ))
-  closeTo(topStage.y - (topMain.y + topMain.height), 8 * topScale)
+  closeTo(topStage.y - (topMain.y + topMain.height), 10 * topScale)
   closeTo(topImage.height / topStage.height * 100, 40)
-  closeTo(topAuto.y - (topImage.y + topImage.height), 16 * topScale)
+  closeTo(topAuto.y - (topImage.y + topImage.height), 32 * topScale)
 
   await openSlide(page, 108, 'auto-image-bottom')
   const bottom = layoutFor(page, 'auto-image-bottom')
@@ -476,7 +485,7 @@ test('uses block allocation for top and bottom positions', async ({ page }) => {
   ))
   closeTo(bottomStage.y, bottomMain.y + bottomMain.height)
   closeTo(bottomImage.height / bottomStage.height * 100, 40)
-  closeTo(bottomImage.y - (bottomAuto.y + bottomAuto.height), 16 * bottomScale)
+  closeTo(bottomImage.y - (bottomAuto.y + bottomAuto.height), 32 * bottomScale)
 })
 
 test('omitted auto keeps the image edge allocation without reserving a gap', async ({ page }) => {
@@ -788,11 +797,11 @@ test('observes layout style, font, visibility, resize, and HMR invalidations', a
   closeTo(initial.image.width / initial.stage.width * 100, 35)
   closeTo(
     initial.auto.x - (initial.image.x + initial.image.width),
-    16 * initial.scale,
+    32 * initial.scale,
   )
   closeTo(
     initial.auto.width,
-    initial.stage.width - initial.image.width - 16 * initial.scale,
+    initial.stage.width - initial.image.width - 32 * initial.scale,
   )
 
   await page.setViewportSize({ width: 1000, height: 700 })
@@ -802,7 +811,7 @@ test('observes layout style, font, visibility, resize, and HMR invalidations', a
   closeTo(resized.image.width / resized.stage.width * 100, 35)
   closeTo(
     resized.auto.width,
-    resized.stage.width - resized.image.width - 16 * resized.scale,
+    resized.stage.width - resized.image.width - 32 * resized.scale,
   )
 
   await page.evaluate(() => {
@@ -1489,9 +1498,9 @@ test('keeps default v-click and v-clicks AutoImage geometry finite through forwa
   for (const root of backwardSettled.roots) {
     const baselineRoot = baseline.roots.find(candidate => candidate.id === root.id)!
     for (const [index, image] of root.images.entries())
-      expectRectClose(image, baselineRoot.images[index]!)
+      expectRectClose(image, baselineRoot.images[index]!, `backward ${root.id} image ${index}`)
     for (const [index, caption] of root.captions.entries())
-      expectRectClose(caption.rect, baselineRoot.captions[index]!.rect)
+      expectRectClose(caption.rect, baselineRoot.captions[index]!.rect, `backward ${root.id} caption ${caption.id}`)
   }
 
   const direct = await captureAutoImageRevealDirectEntry(page, 'direct-entry')
@@ -1501,8 +1510,8 @@ test('keeps default v-click and v-clicks AutoImage geometry finite through forwa
   for (const root of directSettled.roots) {
     const baselineRoot = baseline.roots.find(candidate => candidate.id === root.id)!
     for (const [index, image] of root.images.entries())
-      expectRectClose(image, baselineRoot.images[index]!)
+      expectRectClose(image, baselineRoot.images[index]!, `direct ${root.id} image ${index}`)
     for (const [index, caption] of root.captions.entries())
-      expectRectClose(caption.rect, baselineRoot.captions[index]!.rect)
+      expectRectClose(caption.rect, baselineRoot.captions[index]!.rect, `direct ${root.id} caption ${caption.id}`)
   }
 })

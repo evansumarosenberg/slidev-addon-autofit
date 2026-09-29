@@ -47,10 +47,10 @@ function setPendingImage(): void {
       <button data-testid="auto-image-layout-set-split" @click="size = '35%'">
         Split
       </button>
-      <button data-testid="auto-image-layout-set-inline-boundary" @click="size = '97%'">
+      <button data-testid="auto-image-layout-set-inline-boundary" @click="size = '95%'">
         Inline boundary
       </button>
-      <button data-testid="auto-image-layout-set-block-boundary" @click="size = '96%'">
+      <button data-testid="auto-image-layout-set-block-boundary" @click="size = '92%'">
         Block boundary
       </button>
       <button data-testid="auto-image-layout-set-unsupported-image" @click="imageMode = 'unsupported'">
